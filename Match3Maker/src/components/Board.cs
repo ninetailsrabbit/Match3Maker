@@ -33,29 +33,32 @@ namespace Match3Maker {
         public Vector2 Offset = new(5, 10);
 
         public IPieceSelector PieceSelector;
+        public ISequenceFinder SequenceFinder;
 
         public List<List<GridCell>> GridCells = [];
         public List<PieceWeight> AvailablePieces = [];
 
 
         #region Constructors
-        public Board(int gridWidth, int gridHeight, IPieceSelector pieceSelector) {
+        public Board(int gridWidth, int gridHeight, IPieceSelector? pieceSelector = null, ISequenceFinder? sequenceFinder = null) {
             GridWidth = gridWidth;
             GridHeight = gridHeight;
-            PieceSelector = pieceSelector;
+            PieceSelector = pieceSelector is not null ? pieceSelector : new PieceWeightSelector();
+            SequenceFinder = sequenceFinder is not null ? sequenceFinder : new SequenceFinder();
         }
 
-        public Board(Vector2 size, IPieceSelector pieceSelector) {
+        public Board(Vector2 size, IPieceSelector? pieceSelector = null, ISequenceFinder? sequenceFinder = null) {
             GridWidth = (int)size.X;
             GridHeight = (int)size.Y;
-            PieceSelector = pieceSelector;
+            PieceSelector = pieceSelector is not null ? pieceSelector : new PieceWeightSelector();
+            SequenceFinder = sequenceFinder is not null ? sequenceFinder : new SequenceFinder();
         }
 
-        public static Board Create(int gridWidth, int gridHeight, IPieceSelector pieceSelector)
-            => new(gridWidth, gridHeight, pieceSelector);
+        public static Board Create(int gridWidth, int gridHeight, IPieceSelector? pieceSelector = null, ISequenceFinder? sequenceFinder = null)
+            => new(gridWidth, gridHeight, pieceSelector, sequenceFinder);
 
-        public static Board Create(Vector2 size, IPieceSelector pieceSelector)
-            => Create((int)size.X, (int)size.Y, pieceSelector);
+        public static Board Create(Vector2 size, IPieceSelector? pieceSelector = null, ISequenceFinder? sequenceFinder = null)
+            => Create((int)size.X, (int)size.Y, pieceSelector, sequenceFinder);
 
         #endregion
 
