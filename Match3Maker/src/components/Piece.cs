@@ -18,7 +18,7 @@ namespace Match3Maker {
         }
     }
 
-    public class Piece : INotifyPropertyChanged, ICloneable {
+    public class Piece : INotifyPropertyChanged, ICloneable, IEquatable<Piece> {
         public enum TYPES {
             NORMAL, SPECIAL, OBSTACLE
         }
@@ -74,10 +74,16 @@ namespace Match3Maker {
             return MemberwiseClone();
         }
 
+        public bool Equals(Piece? other) {
+            return MatchWith(other);
+        }
+
         #region EventHandlers
         private void OnPropertyChanged(string propertyName) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+      
 
         #endregion
     }

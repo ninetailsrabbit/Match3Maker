@@ -251,5 +251,33 @@ namespace Match3Maker {
         }
 
         #endregion
+
+        #region Pieces
+        public Board AddAvailablePieces(IList<PieceWeight> pieces) {
+            AvailablePieces.AddRange(pieces);
+            AvailablePieces = AvailablePieces.RemoveDuplicates().ToList();
+
+            return this;
+        }
+
+        public Board AddAvailablePiece(PieceWeight piece) {
+            AvailablePieces.Add(piece);
+            AvailablePieces = AvailablePieces.RemoveDuplicates().ToList();
+
+            return this;
+        }
+        public Board RemoveAvailablePieces(IList<PieceWeight> pieces) {
+            foreach (PieceWeight piece in pieces)
+                RemoveAvailablePiece(piece);
+
+            return this;
+        }
+        public Board RemoveAvailablePiece(PieceWeight piece) {
+            AvailablePieces.Remove(piece);
+
+            return this;
+        }
+
+        #endregion
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 
 namespace Match3Maker {
-    public sealed class GridCell {
+    public sealed class GridCell: IEquatable<GridCell> {
 
         #region Properties
         public Guid Id = Guid.NewGuid();
@@ -108,5 +108,8 @@ namespace Match3Maker {
                  cell.InSamePositionAs(diagonalBottomLeft);
         }
 
+        public bool Equals(GridCell? other) {
+            return InSamePositionAs(other);
+        }
     }
 }

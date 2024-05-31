@@ -307,6 +307,56 @@ namespace Match3Tests {
             Assert.Equal(cell, board.FindGridCellWithPiece(piece));
         }
 
+        [Fact]
+        public void Should_Add_Available_Pieces() {
+            var board = new Board(8, 7, _mockPieceSelector.Object);
+
+            List<PieceWeight> pieces = [new PieceWeight("square"), new PieceWeight("circle")];
+            PieceWeight trianglePiece = new("triangle");
+
+            Assert.Empty(board.AvailablePieces);
+
+            board.AddAvailablePieces(pieces);
+
+            Assert.Equal(pieces.Count, board.AvailablePieces.Count);
+
+            board.AddAvailablePiece(trianglePiece);
+
+            Assert.Equal(pieces.Count + 1, board.AvailablePieces.Count);
+
+            board.AddAvailablePiece(trianglePiece);
+
+            // Duplicates are removed
+            Assert.Equal(pieces.Count + 1, board.AvailablePieces.Count);
+        }
+
+
+        [Fact]
+        public void Should_Remove_Available_Pieces() {
+            var board = new Board(8, 7, _mockPieceSelector.Object);
+
+            PieceWeight square = new("square");
+            PieceWeight circle = new("circle");
+            PieceWeight triangle = new("triangle");
+
+            List<PieceWeight> pieces = [square, circle, triangle];
+
+            board.AddAvailablePieces(pieces);
+
+            Assert.Equal(pieces.Count, board.AvailablePieces.Count);
+
+            board.RemoveAvailablePiece(circle);
+
+            Assert.Equal(2, board.AvailablePieces.Count);
+            Assert.True(board.AvailablePieces.All(piece => !piece.Shape.Equals("circle")));
+
+            board.RemoveAvailablePieces(pieces);
+
+            Assert.Empty(board.AvailablePieces);
+        }
+
+
+
     }
 
 }
