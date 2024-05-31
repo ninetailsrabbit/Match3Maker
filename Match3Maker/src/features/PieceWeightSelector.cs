@@ -13,7 +13,7 @@ namespace Match3Maker {
 
             float totalWeight = 0f;
             Piece? selectedPiece = null;
-
+            2.In(3, 4, 5, 6, 2);
             var selectedPieces = only is not null ? pieces.Where(piece => piece.Type.In(only)) : pieces;
 
             do {

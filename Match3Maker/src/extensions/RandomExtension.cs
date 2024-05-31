@@ -18,7 +18,7 @@
         /// 
         /// https://stackoverflow.com/questions/63650648/random-float-in-c-sharp
         /// </remarks>
-        public static float NextFloat(this Random random, float minValue = 1f, float maxValue = 1f) {
+        public static float NextFloat(this Random random, float minValue = 0.000001f, float maxValue = 1f) {
             float range = Math.Min(1, Math.Max(minValue, maxValue) - Math.Min(minValue, maxValue));
 
             double mantissa = (random.NextDouble() * 2.0) - 1.0;

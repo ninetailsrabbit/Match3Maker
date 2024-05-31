@@ -143,10 +143,35 @@ namespace Match3Maker {
             return Cell(cell.Column, upperRow);
         }
 
+        public List<GridCell> UpperCellsFrom(GridCell cell, int distance) {
+            List<GridCell> cells = [];
+
+            distance = Math.Clamp(distance, 0, GridHeight);
+
+            var currentCell = UpperCellFrom(cell);
+
+            if (distance > 0 && currentCell is not null)
+                cells.AddRange([currentCell, .. UpperCellsFrom(currentCell, distance - 1)]);
+
+            return cells;
+        }
+
         public GridCell? BottomCellFrom(GridCell cell) {
             var bottomRow = cell.Row + 1;
 
             return Cell(cell.Column, bottomRow);
+        }
+        public List<GridCell> BottomCellsFrom(GridCell cell, int distance) {
+            List<GridCell> cells = [];
+
+            distance = Math.Clamp(distance, 0, GridHeight);
+
+            var currentCell = BottomCellFrom(cell);
+
+            if (distance > 0 && currentCell is not null)
+                cells.AddRange([currentCell, .. BottomCellsFrom(currentCell, distance - 1)]);
+
+            return cells;
         }
 
         public GridCell? RightCellFrom(GridCell cell) {
@@ -155,11 +180,39 @@ namespace Match3Maker {
             return Cell(rightColumn, cell.Row);
         }
 
+        public List<GridCell> RightCellsFrom(GridCell cell, int distance) {
+            List<GridCell> cells = [];
+
+            distance = Math.Clamp(distance, 0, GridWidth);
+
+            var currentCell = RightCellFrom(cell);
+
+            if (distance > 0 && currentCell is not null)
+                cells.AddRange([currentCell, .. RightCellsFrom(currentCell, distance - 1)]);
+
+            return cells;
+        }
+
         public GridCell? LeftCellFrom(GridCell cell) {
             var leftColumn = cell.Column - 1;
 
             return Cell(leftColumn, cell.Row);
         }
+
+        public List<GridCell> LeftCellsFrom(GridCell cell, int distance) {
+            List<GridCell> cells = [];
+
+            distance = Math.Clamp(distance, 0, GridWidth);
+
+            var currentCell = LeftCellFrom(cell);
+
+            if (distance > 0 && currentCell is not null)
+                cells.AddRange([currentCell, .. LeftCellsFrom(currentCell, distance - 1)]);
+
+            return cells;
+        }
+
+
         public List<GridCell> EmptyCells() {
             return GridCells.SelectMany(cells => cells).Where(cell => cell.IsEmpty()).ToList();
         }

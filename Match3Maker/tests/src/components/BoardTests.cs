@@ -155,6 +155,79 @@ namespace Match3Tests {
         }
 
         [Fact]
+        public void Should_Return_Upper_Cells_From_Selected_Cell() {
+            var board = new Board(4, 5, _mockPieceSelector.Object);
+            board.PrepareGridCells();
+
+            var originCell = board.Cell(2, 4);
+            var upperCells = board.UpperCellsFrom(originCell, board.GridHeight);
+
+            Assert.Equal(board.GridHeight - 1, upperCells.Count);
+            Assert.True(upperCells.All(cell => !cell.Row.Equals(originCell.Row) && cell.Column.Equals(originCell.Column)));
+
+            upperCells = board.UpperCellsFrom(originCell, 1);
+
+            Assert.Single(upperCells);
+            Assert.Equal(upperCells[0].Column, originCell.Column);
+            Assert.Equal(upperCells[0].Row, originCell.Row - 1);
+        }
+
+        [Fact]
+        public void Should_Return_Right_Cells_From_Selected_Cell() {
+            var board = new Board(4, 5, _mockPieceSelector.Object);
+            board.PrepareGridCells();
+
+            var originCell = board.Cell(0, 2);
+            var rightCells = board.RightCellsFrom(originCell, board.GridWidth);
+
+            Assert.Equal(board.GridWidth - 1, rightCells.Count);
+            Assert.True(rightCells.All(cell => cell.Row.Equals(originCell.Row) && !cell.Column.Equals(originCell.Column)));
+
+            rightCells = board.RightCellsFrom(originCell, 1);
+
+            Assert.Single(rightCells);
+            Assert.Equal(rightCells[0].Row, originCell.Row);
+            Assert.Equal(rightCells[0].Column, originCell.Column + 1);
+        }
+
+        [Fact]
+        public void Should_Return_Left_Cells_From_Selected_Cell() {
+            var board = new Board(4, 5, _mockPieceSelector.Object);
+            board.PrepareGridCells();
+
+            var originCell = board.Cell(3, 1);
+            var leftCells = board.LeftCellsFrom(originCell, board.GridWidth);
+
+            Assert.Equal(board.GridWidth - 1, leftCells.Count);
+            Assert.True(leftCells.All(cell => cell.Row.Equals(originCell.Row) && !cell.Column.Equals(originCell.Column)));
+
+            leftCells = board.LeftCellsFrom(originCell, 1);
+
+            Assert.Single(leftCells);
+            Assert.Equal(leftCells[0].Row, originCell.Row);
+            Assert.Equal(leftCells[0].Column, originCell.Column - 1);
+        }
+
+
+        [Fact]
+        public void Should_Return_Bottoms_Cells_From_Selected_Cell() {
+            var board = new Board(4, 5, _mockPieceSelector.Object);
+            board.PrepareGridCells();
+
+            var originCell = board.Cell(1, 0);
+            var bottomCells = board.BottomCellsFrom(originCell, board.GridHeight);
+
+            Assert.Equal(board.GridHeight - 1, bottomCells.Count);
+            Assert.True(bottomCells.All(cell => !cell.Row.Equals(originCell.Row) && cell.Column.Equals(originCell.Column)));
+
+            bottomCells = board.BottomCellsFrom(originCell, 1);
+
+            Assert.Single(bottomCells);
+            Assert.Equal(bottomCells[0].Column, originCell.Column);
+            Assert.Equal(bottomCells[0].Row, originCell.Row + 1);
+        }
+
+        [Fact]
         public void Should_Return_Selected_Row_Cells() {
             var board = new Board(8, 7, _mockPieceSelector.Object);
             board.PrepareGridCells();
