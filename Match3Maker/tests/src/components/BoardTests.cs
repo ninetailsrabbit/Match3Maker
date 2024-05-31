@@ -145,6 +145,87 @@ namespace Match3Tests {
             Assert.Equal(originCell.Column - 1, leftCell.Column);
             Assert.Equal(leftCell.Row, originCell.Row);
         }
+
+        [Fact]
+        public void Should_Return_Selected_Row_Cells() {
+            var board = new Board(8, 7, _mockPieceSelector.Object);
+            board.PrepareGridCells();
+
+            var rowCells = board.CellsFromRow(1);
+
+            Assert.Equal(board.GridWidth, rowCells.Count);
+            Assert.True(rowCells.All(cell => cell.Row.Equals(1)));
+
+            rowCells = board.CellsFromRow(5);
+
+            Assert.Equal(board.GridWidth, rowCells.Count);
+            Assert.True(rowCells.All(cell => cell.Row.Equals(5)));
+
+            Assert.Empty(board.CellsFromRow(-1));
+            Assert.Empty(board.CellsFromRow(9));
+
+        }
+
+        [Fact]
+        public void Should_Return_Selected_Column_Cells() {
+            var board = new Board(8, 7, _mockPieceSelector.Object);
+            board.PrepareGridCells();
+
+            var columnCells = board.CellsFromColumn(1);
+
+            Assert.Equal(board.GridHeight, columnCells.Count);
+            Assert.True(columnCells.All(cell => cell.Column.Equals(1)));
+
+            columnCells = board.CellsFromColumn(5);
+
+            Assert.Equal(board.GridHeight, columnCells.Count);
+            Assert.True(columnCells.All(cell => cell.Column.Equals(5)));
+
+            Assert.Empty(board.CellsFromColumn(-1));
+            Assert.Empty(board.CellsFromColumn(8));
+        }
+
+        [Fact]
+        public void Should_Return_Empty_Cells_From_Column() {
+            var board = new Board(8, 7, _mockPieceSelector.Object);
+            board.PrepareGridCells();
+
+            Assert.Equal(board.GridHeight, board.EmptyCellsFromColumn(0).Count);
+
+            board.Cell(0, 0)?.AssignPiece(new Piece("circle"));
+            board.Cell(0, 1)?.AssignPiece(new Piece("circle"));
+
+            Assert.Equal(board.GridHeight - 2, board.EmptyCellsFromColumn(0).Count);
+        }
+
+        [Fact]
+        public void Should_Return_Empty_Cells_From_Row() {
+            var board = new Board(8, 7, _mockPieceSelector.Object);
+            board.PrepareGridCells();
+
+            Assert.Equal(board.GridWidth, board.EmptyCellsFromRow(0).Count);
+
+            board.Cell(0, 0)?.AssignPiece(new Piece("circle"));
+            board.Cell(1, 0)?.AssignPiece(new Piece("circle"));
+
+            Assert.Equal(board.GridWidth - 2, board.EmptyCellsFromRow(0).Count);
+        }
+
+        [Fact]
+        public void Should_Find_The_GridCell_Related_To_Piece() {
+            var board = new Board(8, 7, _mockPieceSelector.Object);
+            board.PrepareGridCells();
+
+            var cell = board.Cell(2, 5);
+            var piece = new Piece("circle");
+
+            Assert.Null(board.FindGridCellWithPiece(piece));
+
+            cell?.AssignPiece(piece);
+
+            Assert.Equal(cell, board.FindGridCellWithPiece(piece));
+        }
+
     }
 
 }

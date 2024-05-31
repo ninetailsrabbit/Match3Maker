@@ -18,6 +18,17 @@ namespace Match3Tests {
         }
 
         [Fact]
+        public void Should_Create_Sequence_Without_Empty_Cells() {
+            var cells = new List<GridCell>() {new(1, 2, new Piece("triangle")), new(1, 3, new Piece("triangle")), new(1, 4, new Piece("triangle")) };
+            var emptyCell = new GridCell(1, 5);
+
+            var sequence = new Sequence([..cells, emptyCell], Sequence.SHAPES.HORIZONTAL);
+
+            Assert.Equal(cells.Count, sequence.Size());
+            Assert.True(sequence.Cells.All(cell => cell.HasPiece()));
+        }
+
+        [Fact]
         public void Should_Get_All_The_Pieces_From_Cells() {
             var cells = new List<GridCell>() { new(1, 2, new Piece("triangle")), new(1, 3, new Piece("triangle")), new(1, 4, new Piece("triangle")) };
             var sequence = new Sequence(cells, Sequence.SHAPES.VERTICAL);

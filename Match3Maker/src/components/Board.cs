@@ -154,6 +154,40 @@ namespace Match3Maker {
         public List<GridCell> EmptyCells() {
             return GridCells.SelectMany(cells => cells).Where(cell => cell.IsEmpty()).ToList();
         }
+
+        public List<GridCell> EmptyCellsFromRow(int row) => CellsFromRow(row).Where(cell => cell.IsEmpty()).ToList();
+        public List<GridCell> EmptyCellsFromColumn(int column) => CellsFromColumn(column).Where(cell => cell.IsEmpty()).ToList();
+
+        public List<GridCell> CellsFromColumn(int column) {
+            List<GridCell> result = [];
+
+
+            if (GridCells.Count > 0 && column < GridWidth && (column & int.MinValue) == 0) {
+                foreach (int row in Enumerable.Range(0, GridHeight))
+                    result.Add(GridCells[column][row]);
+            }
+
+            return result;
+        }
+
+        public List<GridCell> CellsFromRow(int row) {
+            List<GridCell> result = [];
+
+            if (GridCells.Count > 0 && row < GridHeight && (row & int.MinValue) == 0) {
+                foreach (int column in Enumerable.Range(0, GridWidth))
+                    result.Add(GridCells[column][row]);
+            }
+
+            return result;
+        }
+
+        public GridCell? FindGridCellWithPiece(Piece piece) {
+            return GridCells.SelectMany(cells => cells)
+                .Where(cell => cell.HasPiece())
+                .ToList()
+                .Find(cell => cell.Piece.Equals(piece));
+        }
+
         #endregion
     }
 }
