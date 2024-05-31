@@ -10,7 +10,7 @@ namespace Match3Tests {
         private readonly Mock<IPieceSelector> _mockPieceSelector = new();
 
         [Fact]
-        public void Can_Be_Created_With_Static_Method_Create() {
+        public void Can_Be_Created_With_Static_Constructor() {
             int width = 5;
             int height = 6;
 
@@ -19,6 +19,14 @@ namespace Match3Tests {
             Assert.Equal(width, board.GridWidth);
             Assert.Equal(height, board.GridHeight);
             Assert.Equal(width * height, board.Dimensions());
+
+            Vector2 size = new(10, 7);
+
+            board = Board.Create(size, _mockPieceSelector.Object);
+
+            Assert.Equal((int)size.X, board.GridWidth);
+            Assert.Equal((int)size.Y, board.GridHeight);
+            Assert.Equal(size.X * size.Y, board.Dimensions());
         }
 
         [Fact]

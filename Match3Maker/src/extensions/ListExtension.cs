@@ -25,14 +25,14 @@
         /// <summary>
         /// Removes duplicate elements from an IEnumerable sequence and returns a new list containing the unique elements.
         /// </summary>
-        /// <param name="list">The IEnumerable sequence to remove duplicates from.</param>
+        /// <param name="sequence">The IEnumerable sequence to remove duplicates from.</param>
         /// <returns>A new List containing the unique elements from the input sequence.</returns>
         public static IEnumerable<T> RemoveDuplicates<T>(this IEnumerable<T> sequence) => sequence.Distinct();
 
         /// <summary>
         /// Filters out null elements from an IEnumerable sequence and returns a new sequence containing only non-null elements.
         /// </summary>
-        /// <param name="list">The IEnumerable sequence to remove null elements from.</param>
+        /// <param name="sequence">The IEnumerable sequence to remove null elements from.</param>
         /// <returns>A new IEnumerable sequence containing only non-null elements from the input sequence.</returns>
         /// <typeparam name="T">The type of elements in the sequence (assumed to be nullable).</typeparam>
         /// <exception cref="InvalidOperationException">Throws if the source sequence is null.</exception>
@@ -54,7 +54,7 @@
         /// Shuffles the elements of the specified IList in random order using the Fisher-Yates algorithm.
         /// </summary>
         /// <typeparam name="T">The type of elements contained in the IList.</typeparam>
-        /// <param name="list">The IList to be shuffled.</param>
+        /// <param name="sequence">The IList to be shuffled.</param>
         public static void Shuffle<T>(this IList<T> sequence) {
             int n = sequence.Count;
 

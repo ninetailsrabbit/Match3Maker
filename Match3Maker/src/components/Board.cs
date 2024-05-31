@@ -45,8 +45,17 @@ namespace Match3Maker {
             PieceSelector = pieceSelector;
         }
 
+        public Board(Vector2 size, IPieceSelector pieceSelector) {
+            GridWidth = (int)size.X;
+            GridHeight = (int)size.Y;
+            PieceSelector = pieceSelector;
+        }
+
         public static Board Create(int gridWidth, int gridHeight, IPieceSelector pieceSelector)
             => new(gridWidth, gridHeight, pieceSelector);
+
+        public static Board Create(Vector2 size, IPieceSelector pieceSelector)
+            => Create((int)size.X, (int)size.Y, pieceSelector);
 
         #endregion
 
