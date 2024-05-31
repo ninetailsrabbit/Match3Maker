@@ -79,7 +79,6 @@ namespace Match3Maker {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-     
         #endregion
     }
 }
