@@ -185,6 +185,30 @@ namespace Match3Tests {
 
             cell.SwapRejected -= listener;
         }
+
+        [Fact]
+        public void Should_Detect_Adjacent_Diagonal_Cells() {
+            var cell = new GridCell(3, 4, new Piece("square"));
+
+            var diagonalTopRightCell = new GridCell(2, 5);
+            var diagonalTopLeftCell = new GridCell(2, 3);
+            var diagonalBottomRightCell = new GridCell(4, 5);
+            var diagonalBottomLeftCell = new GridCell(4, 3);
+
+
+            Assert.True(cell.InDiagonalWith(diagonalTopRightCell));
+            Assert.True(cell.InDiagonalWith(diagonalTopLeftCell));
+            Assert.True(cell.InDiagonalWith(diagonalBottomRightCell));
+            Assert.True(cell.InDiagonalWith(diagonalBottomLeftCell));
+
+            var nonDiagonalCell = new GridCell(1, 1);
+            var nonDiagonalCell2 = new GridCell(5, 2);
+            var nonDiagonalCell3 = new GridCell(0, 0);
+
+            Assert.False(cell.InDiagonalWith(nonDiagonalCell));
+            Assert.False(cell.InDiagonalWith(nonDiagonalCell2));
+            Assert.False(cell.InDiagonalWith(nonDiagonalCell3));
+        }
     }
 
 

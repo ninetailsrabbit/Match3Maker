@@ -74,9 +74,12 @@ namespace Match3Maker {
                 && !Piece.Equals(otherCell.Piece);
         }
 
+
         public bool InSameRowAs(GridCell cell) => cell.Row.Equals(Row);
         public bool InSameColumnAs(GridCell cell) => cell.Column.Equals(Column);
         public bool InSamePositionAs(GridCell cell) => InSameColumnAs(cell) && InSameRowAs(cell);
+        public bool InSamePositionAs(Vector2 position) => position.X.Equals(Row) && position.Y.Equals(Column);
+
         public bool IsRowNeighbourOf(GridCell cell) {
             int leftColumn = Column - 1;
             int rightColumn = Column + 1;
@@ -92,6 +95,18 @@ namespace Match3Maker {
         }
 
         public bool IsAdjacentTo(GridCell cell) => IsRowNeighbourOf(cell) || IsColumnNeighbourOf(cell);
+
+        public bool InDiagonalWith(GridCell cell) {
+            Vector2 diagonalTopRight = new(Row - 1, Column + 1);
+            Vector2 diagonalTopLeft = new(Row - 1, Column - 1);
+            Vector2 diagonalBottomRight = new(Row + 1, Column + 1);
+            Vector2 diagonalBottomLeft = new(Row + 1, Column - 1);
+
+            return cell.InSamePositionAs(diagonalTopRight) ||
+                 cell.InSamePositionAs(diagonalTopLeft) ||
+                 cell.InSamePositionAs(diagonalBottomRight) ||
+                 cell.InSamePositionAs(diagonalBottomLeft);
+        }
 
     }
 }
