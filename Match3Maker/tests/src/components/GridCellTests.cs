@@ -1,4 +1,5 @@
 ﻿using Match3Maker;
+using System.Data.Common;
 using System.Numerics;
 using Xunit;
 
@@ -16,10 +17,9 @@ namespace Match3Tests {
         [Fact]
         public void ThrowException_When_Coordinates_Are_Negative() {
             ArgumentException exception = Assert.Throws<ArgumentException>(() => new GridCell(-1, 6));
-            Assert.Equal($"GridCell cannot have negative column {-1} & row {6}", exception.Message);
-
+            Assert.Equal($"GridCell cannot have a negative column {-1} or row {6}", exception.Message);
             exception = Assert.Throws<ArgumentException>(() => new GridCell(1, -6));
-            Assert.Equal($"GridCell cannot have negative column {1} & row {-6}", exception.Message);
+            Assert.Equal($"GridCell cannot have a negative column {1} or row {-6}", exception.Message);
         }
 
         [Fact]

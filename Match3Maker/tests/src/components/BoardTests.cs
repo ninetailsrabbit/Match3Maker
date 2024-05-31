@@ -1,18 +1,20 @@
 ﻿
 using Match3Maker;
+using Moq;
 using System.Numerics;
 using Xunit;
 
 namespace Match3Tests {
 
     public class BoardTests {
+        private readonly Mock<IPieceSelector> _mockPieceSelector = new();
 
         [Fact]
         public void Can_Be_Created_With_Static_Method_Create() {
             int width = 5;
             int height = 6;
 
-            var board = Board.Create(width, height);
+            var board = Board.Create(width, height, _mockPieceSelector.Object);
 
             Assert.Equal(width, board.GridWidth);
             Assert.Equal(height, board.GridHeight);
@@ -24,7 +26,7 @@ namespace Match3Tests {
             int width = 5;
             int height = 6;
 
-            var board = new Board(width, height);
+            var board = new Board(width, height, _mockPieceSelector.Object);
 
             Assert.Equal(width, board.GridWidth);
             Assert.Equal(height, board.GridHeight);
@@ -46,7 +48,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Grid_Dimensions_Are_Clamped_ToMin() {
-            var board = new Board(2, 1);
+            var board = new Board(2, 1, _mockPieceSelector.Object);
 
             Assert.Equal(Board.MIN_GRID_WIDTH, board.GridWidth);
             Assert.Equal(Board.MIN_GRID_HEIGHT, board.GridHeight);
@@ -55,7 +57,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Be_Able_To_Generate_Grid_Cells_Based_On_Size() {
-            var board = new Board(8, 7);
+            var board = new Board(8, 7, _mockPieceSelector.Object);
 
             Assert.Empty(board.GridCells);
 
@@ -73,7 +75,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Be_Able_To_Overwrite_Grid_Cells_When_Size_Is_Changed_And_Overwrite_Is_True() {
-            var board = new Board(8, 7);
+            var board = new Board(8, 7, _mockPieceSelector.Object);
 
             Assert.Empty(board.GridCells);
 
@@ -90,7 +92,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Raise_Prepared_Board_Event_When_Prepared_Grid_Cells() {
-            var board = new Board(5, 6);
+            var board = new Board(5, 6, _mockPieceSelector.Object);
 
             List<string> receivedEvents = [];
 
@@ -110,12 +112,15 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Return_Adjacent_Cells_Or_Null_When_Requested() {
-            var board = new Board(4, 5);
+            var board = new Board(4, 5, _mockPieceSelector.Object);
             board.PrepareGridCells();
 
             Assert.Null(board.Cell(6, 3));
             Assert.Null(board.Cell(0, 9));
             Assert.Null(board.Cell(8, 8));
+            Assert.Null(board.Cell(-1, 0));
+            Assert.Null(board.Cell(0, -1));
+            Assert.Null(board.Cell(-1, -1));
 
             GridCell? originCell = board.Cell(1, 2);
             Assert.NotNull(originCell);

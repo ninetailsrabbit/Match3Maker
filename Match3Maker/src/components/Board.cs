@@ -32,17 +32,21 @@ namespace Match3Maker {
         public Vector2 CellSize = new(48, 48);
         public Vector2 Offset = new(5, 10);
 
+        public IPieceSelector PieceSelector;
+
         public List<List<GridCell>> GridCells = [];
         public List<PieceWeight> AvailablePieces = [];
 
 
         #region Constructors
-        public Board(int gridWidth, int gridHeight) {
+        public Board(int gridWidth, int gridHeight, IPieceSelector pieceSelector) {
             GridWidth = gridWidth;
             GridHeight = gridHeight;
+            PieceSelector = pieceSelector;
         }
 
-        public static Board Create(int gridWidth, int gridHeight) => new(gridWidth, gridHeight);
+        public static Board Create(int gridWidth, int gridHeight, IPieceSelector pieceSelector)
+            => new(gridWidth, gridHeight, pieceSelector);
 
         #endregion
 
