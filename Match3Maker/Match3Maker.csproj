@@ -52,8 +52,4 @@
 		</PackageReference>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="src\interfaces\" />
-	</ItemGroup>
-
 </Project>

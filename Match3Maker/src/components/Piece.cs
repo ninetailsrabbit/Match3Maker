@@ -5,7 +5,7 @@ namespace Match3Maker {
     /// <summary>
     /// Represents a configuration for a game piece used in determining roll probabilities within a match-3 or similar game.
     /// </summary>
-    public class PieceWeight(string shape, Piece.TYPES type = Piece.TYPES.NORMAL, float weight = 1f) {
+    public sealed class PieceWeight(string shape, Piece.TYPES type = Piece.TYPES.NORMAL, float weight = 1f) {
         public Piece.TYPES Type = type;
         public string Shape = shape;
 
@@ -70,14 +70,16 @@ namespace Match3Maker {
             Locked = false;
         }
 
+        public object Clone() {
+            return MemberwiseClone();
+        }
+
         #region EventHandlers
         private void OnPropertyChanged(string propertyName) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public object Clone() {
-            return MemberwiseClone();
-        }
+     
         #endregion
     }
 }
