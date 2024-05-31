@@ -23,6 +23,9 @@ namespace Match3Maker {
         public Vector2 CellSize = new(48, 48);
         public Vector2 Offset = new(5, 10);
 
+        public List<List<GridCell>> GridCells = [];
+
+
         public Board(int gridWidth, int gridHeight) {
             GridWidth = gridWidth;
             GridHeight = gridHeight;
@@ -31,6 +34,60 @@ namespace Match3Maker {
         #region Information
         public int Dimensions() => GridWidth * GridHeight;
         public Vector2 Size() => new(GridWidth, GridHeight);
+        #endregion
+
+
+        #region Options
+        public Board ChangeGridWidth(int width) {
+            GridWidth = width;
+
+            return this;
+        }
+        public Board ChangeGridHeight(int height) {
+            GridHeight = height;
+
+            return this;
+        }
+
+        public Board ChangeGridSize(Vector2 size) {
+            GridWidth = (int)size.X;
+            GridHeight = (int)size.Y;
+
+            return this;
+        }
+
+        public Board ChangeFillMode(FILL_MODES mode) {
+            SelectedFillMode = mode;
+
+            return this;
+        }
+
+        public Board ChangeCellSize(Vector2 size) {
+            CellSize = size;
+
+            return this;
+        }
+
+        public Board ChangeOffset(Vector2 offset) {
+            Offset = offset;
+
+            return this;
+        }
+        #endregion
+
+
+        #region Cells
+        public Board PrepareGridCells() {
+            foreach (var column in Enumerable.Range(0, GridWidth)) {
+                GridCells.Add([]);
+
+                foreach (var row in Enumerable.Range(0, GridHeight)) {
+                    GridCells[column].Add(new GridCell(column, row));
+                }
+            }
+
+            return this;
+        }
         #endregion
     }
 }

@@ -21,7 +21,7 @@ namespace Match3Maker {
 
         public GridCell(int column, int row, Piece? piece = null, bool canContainPiece = true) {
             if (column < 0 || row < 0)
-                throw new ArgumentException($"GridCell cannot have negative column {column} & row {row}");
+                throw new ArgumentException($"GridCell cannot have a negative column {column} or row {row}");
 
             Column = column;
             Row = row;
