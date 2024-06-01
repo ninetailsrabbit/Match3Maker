@@ -56,7 +56,6 @@ namespace Match3Maker {
         public bool IsSpecial() => Type.Equals(TYPES.SPECIAL);
         public bool IsObstacle() => Type.Equals(TYPES.OBSTACLE);
 
-
         public bool MatchWith(Piece piece)
             => Type.Equals(piece.Type) && Shape.Trim().Equals(piece.Shape, StringComparison.OrdinalIgnoreCase);
 
@@ -82,8 +81,6 @@ namespace Match3Maker {
         private void OnPropertyChanged(string propertyName) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-      
 
         #endregion
     }

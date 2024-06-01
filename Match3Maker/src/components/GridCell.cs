@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 
 namespace Match3Maker {
-    public class GridCell: IEquatable<GridCell> {
+    public class GridCell : IEquatable<GridCell> {
 
         #region Properties
         public Guid Id = Guid.NewGuid();
@@ -80,19 +80,16 @@ namespace Match3Maker {
                 && !Piece.Equals(otherCell.Piece);
         }
 
-
         public bool InSameRowAs(GridCell cell) => cell.Row.Equals(Row);
         public bool InSameColumnAs(GridCell cell) => cell.Column.Equals(Column);
         public bool InSamePositionAs(GridCell cell) => InSameColumnAs(cell) && InSameRowAs(cell);
         public bool InSamePositionAs(Vector2 position) => position.X.Equals(Row) && position.Y.Equals(Column);
-
         public bool IsRowNeighbourOf(GridCell cell) {
             int leftColumn = Column - 1;
             int rightColumn = Column + 1;
 
             return InSameRowAs(cell) && new List<int>() { leftColumn, rightColumn }.Any((column) => column.Equals(cell.Column));
         }
-
         public bool IsColumnNeighbourOf(GridCell cell) {
             int upperRow = Row - 1;
             int bottomRow = Row + 1;
@@ -114,6 +111,61 @@ namespace Match3Maker {
                  cell.InSamePositionAs(diagonalBottomLeft);
         }
 
+        #region PositionChecks
+        public bool IsTopLeftCorner() {
+            return NeighbourUp is null
+                && NeighbourBottom is not null
+                && NeighbourRight is not null
+                && NeighbourLeft is null;
+        }
+
+        public bool IsTopRightCorner() {
+            return NeighbourUp is null
+               && NeighbourBottom is not null
+               && NeighbourRight is null
+               && NeighbourLeft is not null;
+        }
+
+        public bool IsBottomLeftCorner() {
+            return NeighbourUp is not null
+               && NeighbourBottom is null
+               && NeighbourRight is not null
+               && NeighbourLeft is null;
+        }
+
+        public bool IsBottomRightCorner() {
+            return NeighbourUp is not null
+              && NeighbourBottom is null
+              && NeighbourRight is null
+              && NeighbourLeft is not null;
+        }
+        public bool IsTopBorder() {
+            return NeighbourUp is null
+                && NeighbourBottom is not null
+                && NeighbourRight is not null
+                && NeighbourLeft is not null;
+        }
+
+        public bool IsBottomBorder() {
+            return NeighbourUp is not null
+                && NeighbourBottom is null
+                && NeighbourRight is not null
+                && NeighbourLeft is not null;
+        }
+
+        public bool IsRightBorder() {
+            return NeighbourUp is not null
+               && NeighbourBottom is not null
+               && NeighbourRight is null
+               && NeighbourLeft is not null;
+        }
+        public bool IsLeftBorder() {
+            return NeighbourUp is not null
+              && NeighbourBottom is not null
+              && NeighbourRight is not null
+              && NeighbourLeft is null;
+        }
+        #endregion
         public bool Equals(GridCell? other) {
             return InSamePositionAs(other);
         }

@@ -140,6 +140,50 @@ namespace Match3Tests {
         }
 
         [Fact]
+        public void Should_Detect_Border_And_Corners() {
+            var board = new Board(8, 7, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+
+            Assert.Empty(board.GridCells);
+
+            board.PrepareGridCells();
+
+            var topLeftCell = board.Cell(0, 0);
+            var topRightCell = board.Cell(7, 0);
+            var bottomRightCell = board.Cell(7, 6);
+            var bottomLeftCell = board.Cell(0, 6);
+            var surroundedCell = board.Cell(2, 2);
+
+            var topBorderCell = board.Cell(3, 0);
+            var bottomBorderCell = board.Cell(2, 6);
+            var leftBorderCell = board.Cell(0, 3);
+            var rightBorderCell = board.Cell(7, 4);
+
+            Assert.True(topLeftCell.IsTopLeftCorner());
+            Assert.True(topRightCell.IsTopRightCorner());
+            Assert.True(bottomLeftCell.IsBottomLeftCorner());
+            Assert.True(bottomRightCell.IsBottomRightCorner());
+
+            Assert.True(topBorderCell.IsTopBorder());
+            Assert.True(bottomBorderCell.IsBottomBorder());
+            Assert.True(leftBorderCell.IsLeftBorder());
+            Assert.True(rightBorderCell.IsRightBorder());
+
+            Assert.False(surroundedCell.IsTopLeftCorner());
+            Assert.False(surroundedCell.IsTopRightCorner());
+            Assert.False(surroundedCell.IsBottomLeftCorner());
+            Assert.False(surroundedCell.IsBottomRightCorner());
+            Assert.False(surroundedCell.IsTopBorder());
+            Assert.False(surroundedCell.IsBottomBorder());
+            Assert.False(surroundedCell.IsRightBorder());
+            Assert.False(surroundedCell.IsLeftBorder());
+            Assert.False(surroundedCell.IsTopBorder());
+            Assert.False(surroundedCell.IsBottomBorder());
+            Assert.False(surroundedCell.IsLeftBorder());
+            Assert.False(surroundedCell.IsRightBorder());
+        }
+
+
+        [Fact]
         public void Should_Raise_Prepared_Board_Event_When_Prepared_Grid_Cells() {
             var board = new Board(5, 6, _mockPieceSelector.Object, _mockSequenceFinder.Object);
 
