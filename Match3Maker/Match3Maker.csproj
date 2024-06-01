@@ -9,7 +9,7 @@
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-		<NoWarn>1591,1573</NoWarn>
+		<NoWarn>1591,1573,8600,8602,8604</NoWarn>
 	</PropertyGroup>
 
 	<PropertyGroup>

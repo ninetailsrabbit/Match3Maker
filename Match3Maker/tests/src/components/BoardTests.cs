@@ -10,7 +10,6 @@ namespace Match3Tests {
         private readonly Mock<IPieceSelector> _mockPieceSelector = new();
         private readonly Mock<ISequenceFinder> _mockSequenceFinder = new();
 
-
         [Fact]
         public void Can_Be_Created_With_Static_Constructor() {
             int width = 5;
@@ -101,6 +100,46 @@ namespace Match3Tests {
         }
 
         [Fact]
+        public void Should_Assign_Neighbours_On_Prepared_Grid_Cells() {
+            var board = new Board(8, 7, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+
+            Assert.Empty(board.GridCells);
+
+            board.PrepareGridCells();
+
+            var topLeftCell = board.Cell(0, 0);
+            var topRightCell = board.Cell(7, 0);
+            var bottomRightCell = board.Cell(7, 6);
+            var bottomLeftCell = board.Cell(0, 6);
+            var surroundedCell = board.Cell(2, 2);
+
+            Assert.Equal(board.Cell(2, 1), surroundedCell.NeighbourUp);
+            Assert.Equal(board.Cell(2, 3), surroundedCell.NeighbourBottom);
+            Assert.Equal(board.Cell(3, 2), surroundedCell.NeighbourRight);
+            Assert.Equal(board.Cell(1, 2), surroundedCell.NeighbourLeft);
+
+            Assert.Null(topLeftCell.NeighbourUp);
+            Assert.Equal(board.Cell(0, 1), topLeftCell.NeighbourBottom);
+            Assert.Equal(board.Cell(1, 0), topLeftCell.NeighbourRight);
+            Assert.Null(topLeftCell.NeighbourLeft);
+
+            Assert.Null(topRightCell.NeighbourUp);
+            Assert.Equal(board.Cell(7, 1), topRightCell.NeighbourBottom);
+            Assert.Null(topRightCell.NeighbourRight);
+            Assert.Equal(board.Cell(6, 0), topRightCell.NeighbourLeft);
+
+            Assert.Equal(board.Cell(0, 5), bottomLeftCell.NeighbourUp);
+            Assert.Null(bottomLeftCell.NeighbourBottom);
+            Assert.Equal(board.Cell(1, 6), bottomLeftCell.NeighbourRight);
+            Assert.Null(bottomLeftCell.NeighbourLeft);
+
+            Assert.Equal(board.Cell(7, 5), bottomRightCell.NeighbourUp);
+            Assert.Null(bottomRightCell.NeighbourBottom);
+            Assert.Null(bottomRightCell.NeighbourRight);
+            Assert.Equal(board.Cell(6, 6), bottomRightCell.NeighbourLeft);
+        }
+
+        [Fact]
         public void Should_Raise_Prepared_Board_Event_When_Prepared_Grid_Cells() {
             var board = new Board(5, 6, _mockPieceSelector.Object, _mockSequenceFinder.Object);
 
@@ -135,22 +174,22 @@ namespace Match3Tests {
             GridCell? originCell = board.Cell(1, 2);
             Assert.NotNull(originCell);
 
-            GridCell upperCell = board.UpperCellFrom(originCell);
+            GridCell upperCell = originCell.NeighbourUp;
             Assert.True(originCell.IsColumnNeighbourOf(upperCell));
             Assert.Equal(originCell.Row - 1, upperCell.Row);
             Assert.Equal(upperCell.Column, originCell.Column);
 
-            GridCell bottomCell = board.BottomCellFrom(originCell);
+            GridCell bottomCell = originCell.NeighbourBottom;
             Assert.True(originCell.IsColumnNeighbourOf(bottomCell));
             Assert.Equal(originCell.Row + 1, bottomCell.Row);
             Assert.Equal(bottomCell.Column, originCell.Column);
 
-            GridCell rightCell = board.RightCellFrom(originCell);
+            GridCell rightCell = originCell.NeighbourRight;
             Assert.True(originCell.IsRowNeighbourOf(rightCell));
             Assert.Equal(originCell.Column + 1, rightCell.Column);
             Assert.Equal(rightCell.Row, originCell.Row);
 
-            GridCell leftCell = board.LeftCellFrom(originCell);
+            GridCell leftCell = originCell.NeighbourLeft;
             Assert.True(originCell.IsRowNeighbourOf(leftCell));
             Assert.Equal(originCell.Column - 1, leftCell.Column);
             Assert.Equal(leftCell.Row, originCell.Row);

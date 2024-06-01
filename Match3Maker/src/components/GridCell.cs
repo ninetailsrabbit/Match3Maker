@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 
 namespace Match3Maker {
-    public sealed class GridCell: IEquatable<GridCell> {
+    public class GridCell: IEquatable<GridCell> {
 
         #region Properties
         public Guid Id = Guid.NewGuid();
@@ -30,6 +30,12 @@ namespace Match3Maker {
         }
 
         public Vector2 Position() => new(Row, Column);
+
+        public GridCell? NeighbourUp;
+        public GridCell? NeighbourBottom;
+        public GridCell? NeighbourRight;
+        public GridCell? NeighbourLeft;
+
         public bool IsEmpty() => Piece is null;
         public bool HasPiece() => Piece is not null;
         public void AssignPiece(Piece piece) {
