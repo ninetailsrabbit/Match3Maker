@@ -442,6 +442,18 @@ namespace Match3Tests {
         }
 
         [Fact]
+        public void Should_Not_Fill_The_Board_When_Grid_Cells_Are_Empty() {
+            var board = new Board(8, 7, _mockPieceSelector.Object);
+
+            Assert.Empty(board.GridCells);
+
+            board.FillInitialBoard();
+            Assert.Empty(board.GridCells);
+
+
+        }
+
+        [Fact]
         public void Should_Not_Have_Matches_When_Fill_Board_And_No_Matches_Is_True() {
             Piece square = new("square");
             Piece circle = new("circle");

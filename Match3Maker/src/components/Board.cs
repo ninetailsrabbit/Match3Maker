@@ -248,7 +248,7 @@ namespace Match3Maker {
 
                         if (Cell(column, row) is GridCell currentCell && currentCell.IsEmpty()) {
 
-                            if (preSelectedPieces is not null && preSelectedPieces.TryGetValue(currentCell.Position(), out Piece? piece))
+                            if (preSelectedPieces is not null && preSelectedPieces.TryGetValue(currentCell.Position(), out Piece piece))
                                 currentCell.AssignPiece(piece);
                             else
                                 currentCell.AssignPiece(PieceGenerator.Roll(AvailablePieces));
@@ -260,7 +260,7 @@ namespace Match3Maker {
                 if (EmptyCells().Count > 0)
                     throw new InvalidOperationException("Board->FillInitialBoard: After calling the function, some cells are still empty, the operation is not valid");
 
-                if (!allowMatchesOnStart)
+                if (!allowMatchesOnStart && (preSelectedPieces is null || preSelectedPieces.IsEmpty()))
                     RemoveMatchesFromBoard();
 
                 FilledBoard?.Invoke();

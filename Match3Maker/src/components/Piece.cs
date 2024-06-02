@@ -16,7 +16,7 @@ namespace Match3Maker {
         public Color? Color;
 
         public float Weight = 1f;
-        public float TotalAccumWeight = 1f;
+        public float TotalAccumWeight = 0f;
 
         public bool Locked {
             get => _locked; set {
@@ -64,7 +64,9 @@ namespace Match3Maker {
 
         public object Clone() {
             return new Piece(Shape, Type, Weight) {
-                Color = Color
+                Color = Color,
+                Locked = Locked,
+                TotalAccumWeight = 0f
             };
         }
 
