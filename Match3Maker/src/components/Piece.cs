@@ -52,7 +52,9 @@ namespace Match3Maker {
         public bool IsObstacle() => Type.Equals(TYPES.OBSTACLE);
 
         public bool MatchWith(Piece piece)
-            => Type.Equals(piece.Type) && Shape.Trim().Equals(piece.Shape, StringComparison.OrdinalIgnoreCase);
+            => Type.Equals(piece.Type)
+            && Shape.Trim().Equals(piece.Shape, StringComparison.OrdinalIgnoreCase)
+            && Color.Equals(piece.Color);
 
         public bool NotMatchWith(Piece piece) => !MatchWith(piece);
 

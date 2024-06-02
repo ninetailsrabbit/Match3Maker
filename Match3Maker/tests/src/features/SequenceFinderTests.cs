@@ -4,7 +4,7 @@ using Xunit;
 namespace Match3Tests {
 
     public class SequenceFinderTests {
-        private readonly ISequenceFinder _sequenceMatcher = new SequenceFinder(3, 5, true, true, true, true);
+        private readonly ISequenceFinder _sequenceMatcher = new SequenceFinder(3, 5, 2, 3, true, true, true, true);
 
         [Fact]
         public void Should_Return_Empty_When_No_Horizontal_Matches_Found() {

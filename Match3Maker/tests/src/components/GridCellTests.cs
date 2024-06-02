@@ -189,11 +189,10 @@ namespace Match3Tests {
         public void Should_Detect_Adjacent_Diagonal_Cells() {
             var cell = new GridCell(3, 4, new Piece("square"));
 
-            var diagonalTopRightCell = new GridCell(2, 5);
+            var diagonalTopRightCell = new GridCell(4, 3);
             var diagonalTopLeftCell = new GridCell(2, 3);
             var diagonalBottomRightCell = new GridCell(4, 5);
             var diagonalBottomLeftCell = new GridCell(4, 3);
-
 
             Assert.True(cell.InDiagonalWith(diagonalTopRightCell));
             Assert.True(cell.InDiagonalWith(diagonalTopLeftCell));

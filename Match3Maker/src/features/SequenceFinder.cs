@@ -4,6 +4,8 @@ namespace Match3Maker {
     public class SequenceFinder(
         int minMatch = 3,
         int maxMatch = 5,
+        int minSpecialMatch = 2,
+        int maxSpecialMatch = 3,
         bool horizontalShape = true,
         bool verticalShape = true,
         bool tShape = false,
@@ -16,6 +18,8 @@ namespace Match3Maker {
         public bool LShape { get => _lShape; set => _lShape = value; }
         public int MinMatch { get => _minMatch; set => _minMatch = Math.Min(3, value); }
         public int MaxMatch { get => _maxMatch; set => _maxMatch = Math.Max(MinMatch, value); }
+        public int MinSpecialMatch { get => _minSpecialMatch; set => _minSpecialMatch = Math.Min(2, value); }
+        public int MaxSpecialMatch { get => _maxSpecialMatch; set => _maxSpecialMatch = Math.Max(MinSpecialMatch, value); }
 
         #endregion
 
@@ -26,9 +30,11 @@ namespace Match3Maker {
         private bool _lShape = lShape;
         private int _minMatch = minMatch;
         private int _maxMatch = maxMatch;
+        private int _minSpecialMatch = minSpecialMatch;
+        private int _maxSpecialMatch = maxSpecialMatch;
         #endregion
 
-        public IEnumerable<Sequence> FindHorizontalSequences(IEnumerable<GridCell> cells) {
+        public List<Sequence> FindHorizontalSequences(IEnumerable<GridCell> cells) {
             List<Sequence> sequences = [];
             List<GridCell> currentMatches = [];
 
@@ -71,11 +77,11 @@ namespace Match3Maker {
                     });
             }
 
-            return sequences.OrderByDescending(sequence => sequence.Size());
+            return sequences.OrderByDescending(sequence => sequence.Size()).ToList();
         }
 
 
-        public IEnumerable<Sequence> FindVerticalSequences(IEnumerable<GridCell> cells) {
+        public List<Sequence> FindVerticalSequences(IEnumerable<GridCell> cells) {
             List<Sequence> sequences = [];
             List<GridCell> currentMatches = [];
 
@@ -113,7 +119,7 @@ namespace Match3Maker {
                     });
             }
 
-            return sequences.OrderByDescending(sequence => sequence.Size());
+            return sequences.OrderByDescending(sequence => sequence.Size()).ToList();
         }
 
         public Sequence? FindTShapeSequence(Sequence sequenceA, Sequence sequenceB) {
@@ -195,7 +201,7 @@ namespace Match3Maker {
             return null;
         }
 
-        public IEnumerable<Sequence> FindBoardSequences(Board board) {
+        public List<Sequence> FindBoardSequences(Board board) {
             var horizontalSequences = FindHorizontalBoardSequences(board);
             var verticalSequences = FindVerticalBoardSequences(board);
 
@@ -232,7 +238,7 @@ namespace Match3Maker {
         }
 
 
-        public IEnumerable<Sequence> FindHorizontalBoardSequences(Board board) {
+        public List<Sequence> FindHorizontalBoardSequences(Board board) {
             List<Sequence> horizontalSequences = [];
 
             foreach (int row in Enumerable.Range(0, board.GridHeight))
@@ -241,7 +247,7 @@ namespace Match3Maker {
             return horizontalSequences;
         }
 
-        public IEnumerable<Sequence> FindVerticalBoardSequences(Board board) {
+        public List<Sequence> FindVerticalBoardSequences(Board board) {
             List<Sequence> verticalSequences = [];
 
             foreach (int column in Enumerable.Range(0, board.GridWidth))

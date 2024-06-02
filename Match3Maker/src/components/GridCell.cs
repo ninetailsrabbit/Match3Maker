@@ -41,9 +41,6 @@ namespace Match3Maker {
         }
 
         public Vector2 Position() => new(Row, Column);
-
-
-
         public bool IsEmpty() => Piece is null;
         public bool HasPiece() => Piece is not null;
         public void AssignPiece(Piece piece) {
@@ -117,9 +114,9 @@ namespace Match3Maker {
             Vector2 diagonalBottomLeft = new(Row + 1, Column - 1);
 
             return cell.InSamePositionAs(diagonalTopRight) ||
-                 cell.InSamePositionAs(diagonalTopLeft) ||
-                 cell.InSamePositionAs(diagonalBottomRight) ||
-                 cell.InSamePositionAs(diagonalBottomLeft);
+                cell.InSamePositionAs(diagonalTopLeft) ||
+                cell.InSamePositionAs(diagonalBottomRight) ||
+                cell.InSamePositionAs(diagonalBottomLeft);
         }
 
         #region PositionChecks
@@ -177,6 +174,8 @@ namespace Match3Maker {
               && NeighbourLeft is null;
         }
         #endregion
+
+        #region Neighbour Pieces
         public Piece? TopNeighbourPiece() {
             return NeighbourUp?.Piece;
         }
@@ -192,6 +191,24 @@ namespace Match3Maker {
         public Piece? LeftNeighbourPiece() {
             return NeighbourLeft?.Piece;
         }
+
+        public Piece? DiagonalTopRightPiece() {
+            return DiagonalNeighbourTopRight?.Piece;
+        }
+
+        public Piece? DiagonalTopLeftPiece() {
+            return DiagonalNeighbourTopLeft?.Piece;
+        }
+
+        public Piece? DiagonalBottomRightPiece() {
+            return DiagonalNeighbourBottomRight?.Piece;
+        }
+
+        public Piece? DiagonalBottomLeftPiece() {
+            return DiagonalNeighbourBottomLeft?.Piece;
+        }
+
+        #endregion
         public bool Equals(GridCell? other) {
             return InSamePositionAs(other);
         }

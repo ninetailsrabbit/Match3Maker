@@ -8,16 +8,18 @@
         bool LShape { get; set; }
         int MinMatch { get; set; }
         int MaxMatch { get; set; }
+        int MinSpecialMatch { get; set; }
+        int MaxSpecialMatch { get; set; }
         #endregion
 
         #region Find functions
-        public IEnumerable<Sequence> FindHorizontalSequences(IEnumerable<GridCell> cells);
-        public IEnumerable<Sequence> FindVerticalSequences(IEnumerable<GridCell> cells);
+        public List<Sequence> FindHorizontalSequences(IEnumerable<GridCell> cells);
+        public List<Sequence> FindVerticalSequences(IEnumerable<GridCell> cells);
         public Sequence? FindTShapeSequence(Sequence sequenceA, Sequence sequenceB);
         public Sequence? FindLShapeSequence(Sequence sequenceA, Sequence sequenceB);
-        public IEnumerable<Sequence> FindBoardSequences(Board board);
-        public IEnumerable<Sequence> FindHorizontalBoardSequences(Board board);
-        public IEnumerable<Sequence> FindVerticalBoardSequences(Board board);
+        public List<Sequence> FindBoardSequences(Board board);
+        public List<Sequence> FindHorizontalBoardSequences(Board board);
+        public List<Sequence> FindVerticalBoardSequences(Board board);
         public Sequence? FindMatchFromCell(Board board, GridCell cell);
         #endregion
 
