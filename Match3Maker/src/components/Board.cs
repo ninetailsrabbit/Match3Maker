@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Numerics;
+﻿using System.Numerics;
 using SystemExtensions;
 
 namespace Match3Maker {
@@ -259,18 +258,14 @@ namespace Match3Maker {
 
                 foreach (var column in Enumerable.Range(0, GridWidth)) {
                     foreach (var row in Enumerable.Range(0, GridHeight)) {
-                        Debug.WriteLine($"{column},{row}", "POSITION");
 
                         if (Cell(column, row) is GridCell currentCell && currentCell.IsEmpty()) {
-                            Debug.WriteLine($"{currentCell.Position()}", "JOIN CELL");
 
                             if (preSelectedPieces is not null && preSelectedPieces.TryGetValue(currentCell.Position().ToString(), out Piece piece)) {
-                                Debug.WriteLine($"{currentCell.Position()} {piece.Shape}", "WHAT");
                                 currentCell.AssignPiece(piece);
                             }
                             else {
                                 var piecee = PieceGenerator.Roll(AvailablePieces);
-                                Debug.WriteLine($"{currentCell.Position()} {piecee.Shape}, {piecee.Id}", "GENERATE");
 
                                 currentCell.AssignPiece(piecee);
                             }
@@ -297,11 +292,13 @@ namespace Match3Maker {
             while (sequences.Any()) {
                 foreach (Sequence sequence in sequences) {
 
-                    foreach (GridCell cell in sequence.Cells) {
-                        Piece.TYPES pieceType = cell.Piece.Type;
+                    foreach (GridCell currentCell in sequence.Cells) {
+                        var otherShapes = sequence.Cells.Where(cell => !cell.Equals(cell)).Select(cell => cell.Piece.Shape);
 
-                        cell.RemovePiece();
-                        cell.AssignPiece(PieceGenerator.Roll(AvailablePieces, [pieceType]));
+                        Piece.TYPES pieceType = currentCell.Piece.Type;
+
+                        currentCell.RemovePiece();
+                        currentCell.AssignPiece(PieceGenerator.Roll(AvailablePieces.Where(piece => !otherShapes.Contains(piece.Shape)).ToList(), [pieceType]));
                     }
                 }
 

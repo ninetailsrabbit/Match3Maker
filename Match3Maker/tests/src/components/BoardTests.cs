@@ -477,7 +477,7 @@ namespace Match3Tests {
             Assert.Empty(board.GridCells);
         }
 
-        [Fact(Skip = "NEEDS TO REWRITE THE REMOVE MATCHES FROM BOARD ALGORITHM")]
+        [Fact]
         public void Should_Not_Have_Matches_When_Fill_Board_And_No_Matches_Is_True() {
             Piece square = new("square");
             Piece circle = new("circle");
@@ -485,10 +485,7 @@ namespace Match3Tests {
 
             List<Piece> pieces = [square, circle, triangle];
 
-            _mockPieceSelector.Setup(mock => mock.Roll(pieces, null)).Returns(pieces.RandomElement());
-            _mockPieceSelector.Setup(mock => mock.Roll(pieces, new Piece.TYPES[] { Piece.TYPES.NORMAL })).Returns(pieces.RandomElement().Clone() as Piece);
-
-            var board = new Board(8, 7, _mockPieceSelector.Object);
+            var board = new Board(8, 7);
 
             board.AddAvailablePieces(pieces);
 
