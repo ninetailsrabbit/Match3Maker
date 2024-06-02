@@ -15,8 +15,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Be_Created_From_Static_Constructor() {
-            var pieceWeight = new PieceWeight("circle", Piece.TYPES.NORMAL, 2.5f);
-            var piece = Piece.From(pieceWeight);
+            var piece = new Piece("circle", Piece.TYPES.NORMAL, 2.5f);
 
             Assert.Equal(Piece.TYPES.NORMAL, piece.Type);
             Assert.Equal("circle", piece.Shape);

@@ -1,22 +1,8 @@
 ﻿using System.ComponentModel;
+using System.Drawing;
 
 namespace Match3Maker {
 
-    /// <summary>
-    /// Represents a configuration for a game piece used in determining roll probabilities within a match-3 or similar game.
-    /// </summary>
-    public sealed class PieceWeight(string shape, Piece.TYPES type = Piece.TYPES.NORMAL, float weight = 1f) {
-        public Piece.TYPES Type = type;
-        public string Shape = shape;
-
-        #region RollProperties
-        public float Weight = weight;
-        public float TotalAccumWeight = 0f;
-        #endregion
-        public void ResetAccumWeight() {
-            TotalAccumWeight = 0f;
-        }
-    }
 
     public class Piece : INotifyPropertyChanged, ICloneable, IEquatable<Piece> {
         public enum TYPES {
@@ -27,6 +13,11 @@ namespace Match3Maker {
         public Guid Id = Guid.NewGuid();
         public TYPES Type;
         public string Shape;
+        public Color? Color;
+
+        public float Weight = 1f;
+        public float TotalAccumWeight = 1f;
+
         public bool Locked {
             get => _locked; set {
                 if (_locked != value)
@@ -38,20 +29,21 @@ namespace Match3Maker {
 
         private bool _locked = false;
 
-        public Piece(string shape, TYPES type = TYPES.NORMAL) {
+        public Piece(string shape, TYPES type = TYPES.NORMAL, float weight = 1f) {
             Shape = shape;
             Type = type;
+            Weight = weight;
 
             if (type.Equals(TYPES.OBSTACLE))
                 Lock();
-
         }
-
-        public static Piece From(PieceWeight pieceWeight) => new(pieceWeight.Shape, pieceWeight.Type);
 
         #endregion
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        public void ResetAccumWeight() {
+            TotalAccumWeight = 0f;
+        }
         public bool IsNormal() => Type.Equals(TYPES.NORMAL);
         public bool IsSpecial() => Type.Equals(TYPES.SPECIAL);
         public bool IsObstacle() => Type.Equals(TYPES.OBSTACLE);
@@ -62,6 +54,7 @@ namespace Match3Maker {
         public bool NotMatchWith(Piece piece) => !MatchWith(piece);
 
         public void Lock() {
+
             Locked = true;
         }
 
@@ -70,7 +63,9 @@ namespace Match3Maker {
         }
 
         public object Clone() {
-            return MemberwiseClone();
+            return new Piece(Shape, Type, Weight) {
+                Color = Color
+            };
         }
 
         public bool Equals(Piece? other) {

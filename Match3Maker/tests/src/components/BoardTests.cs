@@ -2,12 +2,13 @@
 using Match3Maker;
 using Moq;
 using System.Numerics;
+using SystemExtensions;
 using Xunit;
 
 namespace Match3Tests {
 
     public class BoardTests {
-        private readonly Mock<IPieceSelector> _mockPieceSelector = new();
+        private readonly Mock<IPieceGenerator> _mockPieceSelector = new();
         private readonly Mock<ISequenceFinder> _mockSequenceFinder = new();
 
         [Fact]
@@ -396,8 +397,8 @@ namespace Match3Tests {
         public void Should_Add_Available_Pieces() {
             var board = new Board(8, 7, _mockPieceSelector.Object);
 
-            List<PieceWeight> pieces = [new PieceWeight("square"), new PieceWeight("circle")];
-            PieceWeight trianglePiece = new("triangle");
+            List<Piece> pieces = [new Piece("square"), new Piece("circle")];
+            Piece trianglePiece = new("triangle");
 
             Assert.Empty(board.AvailablePieces);
 
@@ -420,11 +421,11 @@ namespace Match3Tests {
         public void Should_Remove_Available_Pieces() {
             var board = new Board(8, 7, _mockPieceSelector.Object);
 
-            PieceWeight square = new("square");
-            PieceWeight circle = new("circle");
-            PieceWeight triangle = new("triangle");
+            Piece square = new("square");
+            Piece circle = new("circle");
+            Piece triangle = new("triangle");
 
-            List<PieceWeight> pieces = [square, circle, triangle];
+            List<Piece> pieces = [square, circle, triangle];
 
             board.AddAvailablePieces(pieces);
 
@@ -438,6 +439,53 @@ namespace Match3Tests {
             board.RemoveAvailablePieces(pieces);
 
             Assert.Empty(board.AvailablePieces);
+        }
+
+        [Fact]
+        public void Should_Not_Have_Matches_When_Fill_Board_And_No_Matches_Is_True() {
+            Piece square = new("square");
+            Piece circle = new("circle");
+            Piece triangle = new("triangle");
+
+            List<Piece> pieces = [square, circle, triangle];
+
+            _mockPieceSelector.Setup(mock => mock.Roll(pieces, null)).Returns(pieces.RandomElement());
+            _mockPieceSelector.Setup(mock => mock.Roll(pieces, new Piece.TYPES[] { Piece.TYPES.NORMAL })).Returns(pieces.RandomElement());
+
+            var board = new Board(8, 7, _mockPieceSelector.Object);
+
+            board.AddAvailablePieces(pieces);
+
+            board.PrepareGridCells().FillInitialBoard(false);
+
+            Assert.Empty(board.SequenceFinder.FindBoardSequences(board));
+        }
+
+        [Fact]
+        public void Should_Assign_Preselected_Pieces_When_Fill_The_Board() {
+            Piece square = new("square");
+            Piece circle = new("circle");
+            Piece triangle = new("triangle");
+
+            List<Piece> pieces = [square, circle, triangle];
+
+            _mockPieceSelector.Setup(mock => mock.Roll(pieces, null)).Returns(pieces.RandomElement());
+            _mockPieceSelector.Setup(mock => mock.Roll(pieces, new Piece.TYPES[] { Piece.TYPES.NORMAL })).Returns(pieces.RandomElement());
+
+            var board = new Board(8, 7, _mockPieceSelector.Object);
+
+            board.AddAvailablePieces(pieces);
+
+            board.PrepareGridCells().FillInitialBoard(
+                false,
+                new() { 
+                    { new Vector2(1, 1), new Piece("special", Piece.TYPES.SPECIAL) }, 
+                    { new Vector2(3, 5), new Piece("special2", Piece.TYPES.SPECIAL) },
+                }
+            );
+
+            Assert.Equal("special", board.Cell(1, 1).Piece.Shape);
+            Assert.Equal("special2", board.Cell(5, 3).Piece.Shape);
         }
 
     }

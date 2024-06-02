@@ -32,32 +32,32 @@ namespace Match3Maker {
         public Vector2 CellSize = new(48, 48);
         public Vector2 Offset = new(5, 10);
 
-        public IPieceSelector PieceSelector;
+        public IPieceGenerator PieceGenerator;
         public ISequenceFinder SequenceFinder;
 
         public List<List<GridCell>> GridCells = [];
-        public List<PieceWeight> AvailablePieces = [];
+        public List<Piece> AvailablePieces = [];
 
 
         #region Constructors
-        public Board(int gridWidth, int gridHeight, IPieceSelector? pieceSelector = null, ISequenceFinder? sequenceFinder = null) {
+        public Board(int gridWidth, int gridHeight, IPieceGenerator? pieceSelector = null, ISequenceFinder? sequenceFinder = null) {
             GridWidth = gridWidth;
             GridHeight = gridHeight;
-            PieceSelector = pieceSelector is not null ? pieceSelector : new PieceWeightSelector();
+            PieceGenerator = pieceSelector is not null ? pieceSelector : new PieceWeightGenerator();
             SequenceFinder = sequenceFinder is not null ? sequenceFinder : new SequenceFinder();
         }
 
-        public Board(Vector2 size, IPieceSelector? pieceSelector = null, ISequenceFinder? sequenceFinder = null) {
+        public Board(Vector2 size, IPieceGenerator? pieceSelector = null, ISequenceFinder? sequenceFinder = null) {
             GridWidth = (int)size.X;
             GridHeight = (int)size.Y;
-            PieceSelector = pieceSelector is not null ? pieceSelector : new PieceWeightSelector();
+            PieceGenerator = pieceSelector is not null ? pieceSelector : new PieceWeightGenerator();
             SequenceFinder = sequenceFinder is not null ? sequenceFinder : new SequenceFinder();
         }
 
-        public static Board Create(int gridWidth, int gridHeight, IPieceSelector? pieceSelector = null, ISequenceFinder? sequenceFinder = null)
+        public static Board Create(int gridWidth, int gridHeight, IPieceGenerator? pieceSelector = null, ISequenceFinder? sequenceFinder = null)
             => new(gridWidth, gridHeight, pieceSelector, sequenceFinder);
 
-        public static Board Create(Vector2 size, IPieceSelector? pieceSelector = null, ISequenceFinder? sequenceFinder = null)
+        public static Board Create(Vector2 size, IPieceGenerator? pieceSelector = null, ISequenceFinder? sequenceFinder = null)
             => Create((int)size.X, (int)size.Y, pieceSelector, sequenceFinder);
 
         #endregion
@@ -147,7 +147,7 @@ namespace Match3Maker {
 
             return this;
         }
- 
+
 
         public List<GridCell> UpperCellsFrom(GridCell cell, int distance) {
             List<GridCell> cells = [];
@@ -240,29 +240,75 @@ namespace Match3Maker {
                 .Find(cell => cell.Piece.Equals(piece));
         }
 
+        public Board FillInitialBoard(bool allowMatchesOnStart = false, Dictionary<Vector2, Piece>? preSelectedPieces = null) {
+            if (AvailablePieces.Count > 2 && GridCells.Count > 0) {
+
+                foreach (var column in Enumerable.Range(0, GridWidth)) {
+                    foreach (var row in Enumerable.Range(0, GridHeight)) {
+
+                        if (Cell(column, row) is GridCell currentCell && currentCell.IsEmpty()) {
+
+                            if (preSelectedPieces is not null && preSelectedPieces.TryGetValue(currentCell.Position(), out Piece? piece))
+                                currentCell.AssignPiece(piece);
+                            else
+                                currentCell.AssignPiece(PieceGenerator.Roll(AvailablePieces));
+                        }
+
+                    }
+                }
+
+                if (EmptyCells().Count > 0)
+                    throw new InvalidOperationException("Board->FillInitialBoard: After calling the function, some cells are still empty, the operation is not valid");
+
+                if (!allowMatchesOnStart)
+                    RemoveMatchesFromBoard();
+
+                FilledBoard?.Invoke();
+            }
+
+            return this;
+        }
+
+        public void RemoveMatchesFromBoard() {
+            var sequences = SequenceFinder.FindBoardSequences(this);
+
+            while (sequences.Any()) {
+                foreach (Sequence sequence in sequences) {
+                    foreach (GridCell cell in sequence.Cells) {
+                        Piece piece = cell.Piece;
+                        cell.RemovePiece();
+                        cell.AssignPiece(PieceGenerator.Roll(AvailablePieces, [piece.Type]));
+                    }
+                }
+
+                sequences = SequenceFinder.FindBoardSequences(this);
+            }
+        }
+
+
         #endregion
 
         #region Pieces
-        public Board AddAvailablePieces(IList<PieceWeight> pieces) {
+        public Board AddAvailablePieces(IList<Piece> pieces) {
             AvailablePieces.AddRange(pieces);
             AvailablePieces = AvailablePieces.RemoveDuplicates().ToList();
 
             return this;
         }
 
-        public Board AddAvailablePiece(PieceWeight piece) {
+        public Board AddAvailablePiece(Piece piece) {
             AvailablePieces.Add(piece);
             AvailablePieces = AvailablePieces.RemoveDuplicates().ToList();
 
             return this;
         }
-        public Board RemoveAvailablePieces(IList<PieceWeight> pieces) {
-            foreach (PieceWeight piece in pieces)
+        public Board RemoveAvailablePieces(IList<Piece> pieces) {
+            foreach (Piece piece in pieces)
                 RemoveAvailablePiece(piece);
 
             return this;
         }
-        public Board RemoveAvailablePiece(PieceWeight piece) {
+        public Board RemoveAvailablePiece(Piece piece) {
             AvailablePieces.Remove(piece);
 
             return this;
