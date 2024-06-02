@@ -11,6 +11,17 @@ namespace Match3Maker {
         public Piece? Piece;
         #endregion
 
+        #region NeighboursCells
+        public GridCell? NeighbourUp;
+        public GridCell? NeighbourBottom;
+        public GridCell? NeighbourRight;
+        public GridCell? NeighbourLeft;
+        public GridCell? DiagonalNeighbourTopRight;
+        public GridCell? DiagonalNeighbourTopLeft;
+        public GridCell? DiagonalNeighbourBottomRight;
+        public GridCell? DiagonalNeighbourBottomLeft;
+        #endregion
+
         #region Events
         public delegate void SwappedPieceEventHandler(GridCell from, GridCell to);
         public event SwappedPieceEventHandler? SwappedPiece;
@@ -31,14 +42,6 @@ namespace Match3Maker {
 
         public Vector2 Position() => new(Row, Column);
 
-        public GridCell? NeighbourUp;
-        public GridCell? NeighbourBottom;
-        public GridCell? NeighbourRight;
-        public GridCell? NeighbourLeft;
-        public GridCell? DiagonalNeighbourTopRight;
-        public GridCell? DiagonalNeighbourTopLeft;
-        public GridCell? DiagonalNeighbourBottomRight;
-        public GridCell? DiagonalNeighbourBottomLeft;
 
 
         public bool IsEmpty() => Piece is null;
@@ -48,8 +51,11 @@ namespace Match3Maker {
                 Piece = piece;
             }
         }
-        public void RemovePiece() {
+        public Piece? RemovePiece() {
+            Piece? previousPiece = Piece;
             Piece = null;
+
+            return previousPiece;
         }
 
         public bool SwapPieceWith(GridCell otherCell) {

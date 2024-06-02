@@ -1,5 +1,4 @@
 ﻿using Match3Maker;
-using System.Data.Common;
 using System.Numerics;
 using Xunit;
 
@@ -208,6 +207,21 @@ namespace Match3Tests {
             Assert.False(cell.InDiagonalWith(nonDiagonalCell));
             Assert.False(cell.InDiagonalWith(nonDiagonalCell2));
             Assert.False(cell.InDiagonalWith(nonDiagonalCell3));
+        }
+
+        [Fact]
+        public void Should_Remove_Piece_And_Return_It() {
+            var cell = new GridCell(3, 4);
+            var piece = new Piece("square");
+
+            Assert.True(cell.IsEmpty());
+            Assert.Null(cell.RemovePiece());
+
+            cell.AssignPiece(piece);
+
+            Assert.True(cell.HasPiece());
+            Assert.Equal(piece, cell.RemovePiece());
+
         }
     }
 

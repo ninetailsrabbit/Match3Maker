@@ -10,7 +10,7 @@ namespace Match3Maker {
         }
 
         #region Properties
-        public Guid Id;
+        public Guid Id = Guid.NewGuid();
         public TYPES Type;
         public string Shape;
         public Color? Color;
@@ -30,7 +30,6 @@ namespace Match3Maker {
         private bool _locked = false;
 
         public Piece(string shape, TYPES type = TYPES.NORMAL, float weight = 1f) {
-            Id = Guid.NewGuid();
             Shape = shape;
             Type = type;
             Weight = weight;
