@@ -35,6 +35,11 @@ namespace Match3Maker {
         public GridCell? NeighbourBottom;
         public GridCell? NeighbourRight;
         public GridCell? NeighbourLeft;
+        public GridCell? DiagonalNeighbourTopRight;
+        public GridCell? DiagonalNeighbourTopLeft;
+        public GridCell? DiagonalNeighbourBottomRight;
+        public GridCell? DiagonalNeighbourBottomLeft;
+
 
         public bool IsEmpty() => Piece is null;
         public bool HasPiece() => Piece is not null;
@@ -166,6 +171,21 @@ namespace Match3Maker {
               && NeighbourLeft is null;
         }
         #endregion
+        public Piece? TopNeighbourPiece() {
+            return NeighbourUp?.Piece;
+        }
+
+        public Piece? BottomNeighbourPiece() {
+            return NeighbourBottom?.Piece;
+        }
+
+        public Piece? RightNeighbourPiece() {
+            return NeighbourRight?.Piece;
+        }
+
+        public Piece? LeftNeighbourPiece() {
+            return NeighbourLeft?.Piece;
+        }
         public bool Equals(GridCell? other) {
             return InSamePositionAs(other);
         }

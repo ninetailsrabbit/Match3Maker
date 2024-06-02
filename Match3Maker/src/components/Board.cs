@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 using SystemExtensions;
 
 namespace Match3Maker {
@@ -135,12 +136,7 @@ namespace Match3Maker {
                     }
                 }
 
-                GridCells.SelectMany(cells => cells).ToList().ForEach(cell => {
-                    cell.NeighbourUp = Cell(cell.Column, cell.Row - 1);
-                    cell.NeighbourBottom = Cell(cell.Column, cell.Row + 1);
-                    cell.NeighbourRight = Cell(cell.Column + 1, cell.Row);
-                    cell.NeighbourLeft = Cell(cell.Column - 1, cell.Row);
-                });
+                UpdateGridCellsNeighbours();
 
                 PreparedBoard?.Invoke();
             }
@@ -201,12 +197,17 @@ namespace Match3Maker {
 
             return cells;
         }
+        public List<Piece?> UpperCellPiecesFrom(GridCell cell, int distance) =>
+         UpperCellsFrom(cell, distance).Select(cell => cell.Piece).ToList();
+        public List<Piece?> BottomCellPiecesFrom(GridCell cell, int distance)
+            => BottomCellsFrom(cell, distance).Select(cell => cell.Piece).ToList();
+        public List<Piece?> RightCellPiecesFrom(GridCell cell, int distance) =>
+            RightCellsFrom(cell, distance).Select(cell => cell.Piece).ToList();
+        public List<Piece?> LeftCellPiecesFrom(GridCell cell, int distance)
+            => LeftCellsFrom(cell, distance).Select(cell => cell.Piece).ToList();
 
 
-        public List<GridCell> EmptyCells() {
-            return GridCells.SelectMany(cells => cells).Where(cell => cell.IsEmpty()).ToList();
-        }
-
+        public List<GridCell> EmptyCells() => GridCells.SelectMany(cells => cells).Where(cell => cell.IsEmpty()).ToList();
         public List<GridCell> EmptyCellsFromRow(int row) => CellsFromRow(row).Where(cell => cell.IsEmpty()).ToList();
         public List<GridCell> EmptyCellsFromColumn(int column) => CellsFromColumn(column).Where(cell => cell.IsEmpty()).ToList();
 
@@ -233,6 +234,19 @@ namespace Match3Maker {
             return result;
         }
 
+        public void UpdateGridCellsNeighbours() {
+            GridCells.SelectMany(cells => cells).ToList().ForEach(cell => {
+                cell.NeighbourUp = Cell(cell.Column, cell.Row - 1);
+                cell.NeighbourBottom = Cell(cell.Column, cell.Row + 1);
+                cell.NeighbourRight = Cell(cell.Column + 1, cell.Row);
+                cell.NeighbourLeft = Cell(cell.Column - 1, cell.Row);
+                cell.DiagonalNeighbourTopRight = Cell(cell.Column + 1, cell.Row - 1);
+                cell.DiagonalNeighbourTopLeft = Cell(cell.Column - 1, cell.Row - 1);
+                cell.DiagonalNeighbourBottomRight = Cell(cell.Column + 1, cell.Row + 1);
+                cell.DiagonalNeighbourBottomLeft = Cell(cell.Column - 1, cell.Row + 1);
+            });
+        }
+
         public GridCell? FindGridCellWithPiece(Piece piece) {
             return GridCells.SelectMany(cells => cells)
                 .Where(cell => cell.HasPiece())
@@ -240,18 +254,26 @@ namespace Match3Maker {
                 .Find(cell => cell.Piece.Equals(piece));
         }
 
-        public Board FillInitialBoard(bool allowMatchesOnStart = false, Dictionary<Vector2, Piece>? preSelectedPieces = null) {
+        public Board FillInitialBoard(bool allowMatchesOnStart = false, Dictionary<string, Piece>? preSelectedPieces = null) {
             if (AvailablePieces.Count > 2 && GridCells.Count > 0) {
 
                 foreach (var column in Enumerable.Range(0, GridWidth)) {
                     foreach (var row in Enumerable.Range(0, GridHeight)) {
+                        Debug.WriteLine($"{column},{row}", "POSITION");
 
                         if (Cell(column, row) is GridCell currentCell && currentCell.IsEmpty()) {
+                            Debug.WriteLine($"{currentCell.Position()}", "JOIN CELL");
 
-                            if (preSelectedPieces is not null && preSelectedPieces.TryGetValue(currentCell.Position(), out Piece piece))
+                            if (preSelectedPieces is not null && preSelectedPieces.TryGetValue(currentCell.Position().ToString(), out Piece piece)) {
+                                Debug.WriteLine($"{currentCell.Position()} {piece.Shape}", "WHAT");
                                 currentCell.AssignPiece(piece);
-                            else
-                                currentCell.AssignPiece(PieceGenerator.Roll(AvailablePieces));
+                            }
+                            else {
+                                var piecee = PieceGenerator.Roll(AvailablePieces);
+                                Debug.WriteLine($"{currentCell.Position()} {piecee.Shape}, {piecee.Id}", "GENERATE");
+
+                                currentCell.AssignPiece(piecee);
+                            }
                         }
 
                     }
@@ -274,10 +296,12 @@ namespace Match3Maker {
 
             while (sequences.Any()) {
                 foreach (Sequence sequence in sequences) {
+
                     foreach (GridCell cell in sequence.Cells) {
-                        Piece piece = cell.Piece;
+                        Piece.TYPES pieceType = cell.Piece.Type;
+
                         cell.RemovePiece();
-                        cell.AssignPiece(PieceGenerator.Roll(AvailablePieces, [piece.Type]));
+                        cell.AssignPiece(PieceGenerator.Roll(AvailablePieces, [pieceType]));
                     }
                 }
 
