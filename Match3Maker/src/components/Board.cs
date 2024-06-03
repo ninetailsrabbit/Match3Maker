@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 using SystemExtensions;
 
 namespace Match3Maker {
@@ -286,8 +287,18 @@ namespace Match3Maker {
             return this;
         }
 
-        public Dictionary<GridCell, GridCell> Shuffle() {
-            List<GridCell> snapshot = GridCells.SelectMany(cells => cells).Where(cell => cell.HasPiece() && cell.Piece.Type.CanBeShuffled()).ToList();
+
+        public Dictionary<GridCell, GridCell> Shuffle(IEnumerable<Type>? exceptPieceTypes = null, IEnumerable<GridCell?>? exceptCells = null) {
+            exceptPieceTypes ??= [];
+            exceptCells ??= [];
+            exceptCells.RemoveNullables();
+
+            List<GridCell> snapshot = GridCells.SelectMany(cells => cells)
+                .Where(cell => cell.HasPiece()
+                    && cell.Piece.Type.CanBeShuffled()
+                    && !exceptCells.Contains(cell)
+                    && !exceptPieceTypes.Contains(cell.Piece.Type.GetType()))
+                .ToList();
 
             if (GridCells.IsEmpty() || snapshot.IsEmpty())
                 throw new ArgumentException("Board::Shuffle: The board is empty, cannot be shuffled.");
@@ -301,13 +312,17 @@ namespace Match3Maker {
                 if (!shuffleCells.Contains(cell)) {
                     shuffleCells.Add(cell);
 
-                    GridCell targetCell = snapshot.Where(cell => !shuffleCells.Contains(cell)).RandomElement();
+                    var availableCells = snapshot.Where(cell => !shuffleCells.Contains(cell));
 
-                    targetCell.SwapPieceWith(cell);
+                    if (availableCells.Any()) {
+                        GridCell targetCell = availableCells.RandomElement();
 
-                    result.Add(targetCell, cell);
+                        targetCell.SwapPieceWith(cell);
 
-                    shuffleCells.Add(targetCell);
+                        result.Add(targetCell, cell);
+
+                        shuffleCells.Add(targetCell);
+                    }
                 }
             });
 
@@ -321,16 +336,15 @@ namespace Match3Maker {
                 foreach (Sequence sequence in sequences) {
 
                     foreach (GridCell currentCell in sequence.Cells) {
-                        var otherShapes = sequence.Cells.Where(cell => !cell.Equals(currentCell)).Select(cell => cell.Piece.Type.Shape);
+                        var availablePieces = AvailablePieces.Where(piece => !piece.Type.Shape.Equals(currentCell.Piece.Type.Shape)).ToList();
+                        var newPiece = PieceGenerator.Roll(availablePieces, [currentCell.Piece.Type.GetType()]);
 
-                        IPieceType pieceType = currentCell.Piece.Type;
+                        if (newPiece is not null) {
+                            currentCell.RemovePiece();
+                            currentCell.AssignPiece(newPiece);
+                        }
 
-                        currentCell.RemovePiece();
-                        currentCell.AssignPiece(
-                            PieceGenerator.Roll(AvailablePieces
-                            .Where(piece => !otherShapes.Contains(piece.Type.Shape))
-                            .ToList(), [pieceType])
-                        );
+                        
                     }
                 }
 

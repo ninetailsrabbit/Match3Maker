@@ -2,7 +2,6 @@
 using Match3Maker;
 using Moq;
 using System.Numerics;
-using SystemExtensions;
 using Xunit;
 
 namespace Match3Tests {
@@ -533,11 +532,11 @@ namespace Match3Tests {
         public void Should_Throw_Exception_When_Try_To_Shuffle_An_Empty_Board() {
             var board = new Board(8, 7);
 
-            Assert.Throws<ArgumentException>(board.Shuffle);
+            Assert.Throws<ArgumentException>(() => board.Shuffle());
 
             board.PrepareGridCells(); // Grid cells are ready but no pieces assigned
 
-            Assert.Throws<ArgumentException>(board.Shuffle);
+            Assert.Throws<ArgumentException>(() => board.Shuffle());
         }
 
         [Fact]
@@ -559,6 +558,40 @@ namespace Match3Tests {
                 Assert.NotEqual(entry.Key, entry.Value);
                 Assert.NotEqual(entry.Key.Piece, entry.Value.Piece);
             }
+        }
+
+        [Fact]
+        public void Should_Shuffle_All_Valid_Cells_Except_Exceptions_Cells() {
+            Piece square = new(_pieceFactory.CreateNormalPiece("square"));
+            Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
+            Piece triangle = new(_pieceFactory.CreateNormalPiece("triangle"));
+            Piece prism = new(_pieceFactory.CreateNormalPiece("prism"));
+            Piece special = new(_pieceFactory.CreateSpecialPiece("special"));
+
+
+            List<Piece> pieces = [square, circle, triangle, prism, special];
+
+            var board = new Board(8, 7);
+
+            board.AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
+
+            List<GridCell> exceptCells = [board.Cell(0, 1), board.Cell(2, 0), board.Cell(3, 4)];
+
+            var result = board.Shuffle([typeof(SpecialPieceType)], exceptCells);
+
+            foreach (KeyValuePair<GridCell, GridCell> entry in result) {
+                Assert.NotEqual(entry.Key, entry.Value);
+                Assert.NotEqual(entry.Key.Piece, entry.Value.Piece);
+
+                Assert.NotEqual(typeof(SpecialPieceType), entry.Key.Piece.GetType());
+                Assert.NotEqual(typeof(SpecialPieceType), entry.Value.Piece.GetType());
+            }
+
+            exceptCells.ForEach(cell => {
+                Assert.DoesNotContain(cell, result.Keys);
+                Assert.DoesNotContain(cell, result.Values);
+            });
+
         }
 
     }

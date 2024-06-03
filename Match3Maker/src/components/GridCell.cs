@@ -44,9 +44,9 @@ namespace Match3Maker {
         public bool IsEmpty() => Piece is null;
         public bool HasPiece() => Piece is not null;
         public void AssignPiece(Piece piece) {
-            if (CanContainPiece && IsEmpty()) {
+            if (CanContainPiece && IsEmpty())
                 Piece = piece;
-            }
+
         }
         public Piece? RemovePiece() {
             Piece? previousPiece = Piece;
@@ -112,7 +112,7 @@ namespace Match3Maker {
             Vector2 diagonalTopLeft = new(Row - 1, Column - 1);
             Vector2 diagonalBottomRight = new(Row + 1, Column + 1);
             Vector2 diagonalBottomLeft = new(Row + 1, Column - 1);
-           
+
             return cell.InSamePositionAs(diagonalTopRight) ||
                 cell.InSamePositionAs(diagonalTopLeft) ||
                 cell.InSamePositionAs(diagonalBottomRight) ||

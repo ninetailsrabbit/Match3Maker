@@ -1,4 +1,6 @@
-﻿namespace SystemExtensions {
+﻿using System.Diagnostics;
+
+namespace SystemExtensions {
 
     public static class ListExtension {
         private static readonly Random _rng = new();
@@ -247,6 +249,7 @@
 
         public static T RandomElementUsing<T>(this IEnumerable<T> sequence, Random rand) {
             int index = rand.Next(0, sequence.Count());
+
             return sequence.ElementAt(index);
         }
 
