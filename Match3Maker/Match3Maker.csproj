@@ -32,11 +32,11 @@
 		<PackageIcon>icon.png</PackageIcon>
 	</PropertyGroup>
 
-	<!--<ItemGroup>
+	<ItemGroup>
 		<None Include="../README.md" Pack="true" PackagePath="\" />
 		<None Include="../LICENSE" Pack="true" PackagePath="\" />
-		<None Include="icon.png" Pack="True" PackagePath="\" />
-	</ItemGroup>-->
+		<None Include="icon.png" Pack="True" PackagePath="" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />

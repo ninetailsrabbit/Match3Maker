@@ -549,12 +549,9 @@ namespace Match3Tests {
 
             List<Piece> pieces = [square, circle, triangle, prism];
 
-
             var board = new Board(8, 7);
 
             board.AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
-
-            Debug.WriteLine(board.GridCells[0][0].Piece.Id);
 
             var result = board.Shuffle();
 
@@ -562,7 +559,6 @@ namespace Match3Tests {
                 Assert.NotEqual(entry.Key, entry.Value);
                 Assert.NotEqual(entry.Key.Piece, entry.Value.Piece);
             }
-
         }
 
     }
