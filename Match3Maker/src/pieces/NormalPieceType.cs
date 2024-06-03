@@ -14,7 +14,9 @@ namespace Match3Maker {
         }
 
         public bool MatchWith(Piece piece) {
-            return Shape.Trim().Equals(piece.Type.Shape, StringComparison.OrdinalIgnoreCase) && Color.Equals(piece.Type.Color);
+            return piece.Type is not ObstaclePieceType
+                && Shape.Trim().Equals(piece.Type.Shape, StringComparison.OrdinalIgnoreCase)
+                && Color.Equals(piece.Type.Color);
         }
 
         public bool CanBeShuffled() => true;

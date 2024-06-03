@@ -23,12 +23,15 @@ This lightweight library provides the core logic and functionality you need to b
     - [GridCell](#gridcell)
     - [Piece](#piece)
       - [Creating new piece types](#creating-new-piece-types)
+      - [Creating one piece](#creating-one-piece)
     - [Sequence](#sequence)
     - [Board](#board)
 
 ## Getting started
 
 This library empowers you to bring your match-3 game concepts to life quickly and efficiently. Don't get bogged down in the technical details - focus on what makes your game stand out!
+
+**_It not handle any visual components, it contains the logic for you to use it in your project and link the corresponding UI components_**
 
 ### Requirements
 
@@ -75,7 +78,7 @@ The main logic has been simplified in few classes that represents each with a di
 
 Each cell of the board can be accessed through this class. The position of the cells are immutable once the board is initialised so you can avoid common errors.
 
-**You never actually create them yourself, it is recommended to initialise them from the Board class.**
+**_You never actually create them yourself, it is recommended to initialise them from the Board class._**
 
 ```csharp
 // public GridCell(int column, int row, Piece? piece = null, bool canContainPiece = true)
@@ -142,15 +145,180 @@ public bool Equals(GridCell? other) {
 
 ### Piece
 
-A core Piece that manage most of the logic when it comes to interact with. It can be easily extended providing your own types so you're free to decide which one match and which one not.
+A core Piece that manage most of the logic when it comes to interact with. It can be easily extended providing your own types so you're free to decide which one match and which one not. Are intended to handle the internal logic and not its display as a UI.
 
 #### Creating new piece types
 
-```csharp
+To start adding valid pieces into the board, you need to implement the `IPieceType` interface in your class
 
+```csharp
+ public interface IPieceType {
+     public string Shape {  get; set; }
+     public Color? Color { get; set; }
+     public bool MatchWith(Piece piece);
+     public bool CanBeShuffled();
+     public bool CanBeMoved();
+ }
 
 ```
 
+This library provides three types by default _(Normal, Special, Obstacle)_ that you can use in your match-3 game but nothing stops you to create your own custom ones.
+
+```csharp
+  public class NormalPieceType : IPieceType {
+      public string Shape { get => _shape; set => _shape = value; }
+      public Color? Color { get => _color; set => _color = value; }
+
+      private string _shape;
+      private Color? _color = null;
+
+      public NormalPieceType(string shape, Color? color = null) {
+          Shape = shape;
+          Color = color;
+      }
+
+      public bool MatchWith(Piece piece) {
+        return piece.Type is not ObstaclePieceType
+            && Shape.Trim().Equals(piece.Type.Shape, StringComparison.OrdinalIgnoreCase)
+            && Color.Equals(piece.Type.Color);
+      }
+
+      public bool CanBeShuffled() => true;
+      public bool CanBeMoved() => true;
+  }
+```
+
+```csharp
+
+    public class SpecialPieceType : IPieceType {
+        public string Shape { get => _shape; set => _shape = value; }
+        public Color? Color { get => _color; set => _color = value; }
+
+        private string _shape;
+        private Color? _color = null;
+
+        public SpecialPieceType(string shape, Color? color = null) {
+            Shape = shape;
+            Color = color;
+        }
+
+        public bool MatchWith(Piece piece) {
+
+            return typeof(SpecialPieceType).IsAssignableFrom(piece.Type.GetType())
+                && Shape.Trim().Equals(piece.Type.Shape, StringComparison.OrdinalIgnoreCase)
+                && Color.Equals(piece.Type.Color);
+        }
+
+        public bool CanBeShuffled() => true;
+        public bool CanBeMoved() => true;
+    }
+```
+
+```csharp
+
+using System.Drawing;
+
+namespace Match3Maker {
+    public class ObstaclePieceType : IPieceType {
+        public string Shape { get => _shape; set => _shape = value; }
+        public Color? Color { get => _color; set => _color = value; }
+
+        private string _shape;
+        private Color? _color = null;
+
+        public ObstaclePieceType(string shape, Color? color = null) {
+            Shape = shape;
+            Color = color;
+        }
+
+        public bool MatchWith(Piece piece) => false;
+        public bool CanBeShuffled() => false;
+        public bool CanBeMoved() => false;
+
+    }
+
+}
+```
+
+#### Creating one piece
+
+```csharp
+// Only the shape
+var piece = new Piece(new NormalPieceType("circle"));
+
+// Static constructor
+var piece = Piece.create(new NormalPieceType("square", Color.Red));
+
+
+// Properties
+piece.Id
+piece.Type // IPieceType
+piece.Locked
+
+// Probability properties to use with IPieceGenerator
+piece.Weight
+piece.TotalAccumWeight
+
+// Lock methods, just use as information for you to decide whether to move the piece, mix it or match it
+piece.Lock()
+piece.Unlock();
+
+// When you initialize the board the pieces are already instanciated with the proper type, this clone works when it comes to generate new pieces in the board.
+piece.Clone();
+```
+
 ### Sequence
+
+A sequence by definition does not need to follow any rules, the cells from this sequence are considered a match. This provides flexibility to for example remove an entire row in the boardwithout the pieces having to match each other or live in the same row & column.
+
+**The constructor validate the cells passed as parameter and only assign the ones that has a piece.**
+
+The calculations to retrieve the list of cells are done before create the sequence. That's what an `ISequenceFinder` implementation does since it knows how to allocate the proper `SHAPE`.
+
+```csharp
+// Available shapes
+
+ public enum SHAPES {
+     HORIZONTAL,
+     VERTICAL,
+     T_SHAPE,
+     L_SHAPE
+ }
+```
+
+```csharp
+var cells = new List<GridCell>() {new GridCell(1, 0), new GridCell(2, 0), new GridCell(3, 0)}
+var sequence = new Sequence(cells, Sequence.SHAPES.HORIZONTAL)
+
+// Get the current sequence cells
+sequence.Cells();
+
+// Give the size of the sequence
+sequence.Size()
+
+//Remove all the pieces from the cells
+sequence.Consume();
+
+// Get all the pieces from this sequence
+sequence.Pieces();
+
+//Position related, useful for ISequenceFinder to help find shapes.
+sequence.MiddleCell();
+sequence.TopEdgeCell();
+sequence.BottomEdgeCell();
+sequence.LeftEdgeCell();
+sequence.RightEdgeCell();
+
+// Shape shorcuts
+sequence.IsHorizontal();
+sequence.IsVertical();
+sequence.IsTShape();
+sequence.IsLShape();
+
+// To clone sequences before consuming and allow to pass the cells that were affected through events
+sequence.Clone();
+
+
+```
 
 ### Board
