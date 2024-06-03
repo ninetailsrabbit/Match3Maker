@@ -381,6 +381,60 @@ namespace Match3Tests {
         }
 
         [Fact]
+        public void Should_Return_Selected_Pieces_Of_Type() {
+            var board = new Board(8, 7);
+
+            Piece square = new(_pieceFactory.CreateNormalPiece("square"));
+            Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
+            Piece triangle = new(_pieceFactory.CreateNormalPiece("triangle"));
+
+            List<Piece> pieces = [square, circle, triangle];
+
+            board.AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
+
+            var cells = board.CellsOfPieceType(typeof(NormalPieceType));
+
+            Assert.Empty(board.EmptyCells());
+            Assert.Equal(board.Dimensions(), cells.Count);
+        }
+
+        [Fact]
+        public void Should_Return_Selected_Row_Pieces_Of_Type() {
+            var board = new Board(8, 7);
+
+            Piece square = new(_pieceFactory.CreateNormalPiece("square"));
+            Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
+            Piece triangle = new(_pieceFactory.CreateNormalPiece("triangle"));
+
+            List<Piece> pieces = [square, circle, triangle];
+
+            board.AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
+
+            var cells = board.CellsFromRowOfPieceType(1, typeof(NormalPieceType));
+
+            Assert.Equal(board.GridWidth, cells.Count);
+            Assert.True(cells.All(cell => cell.Row.Equals(1)));
+        }
+
+        [Fact]
+        public void Should_Return_Selected_Column_Pieces_Of_Type() {
+            var board = new Board(8, 7);
+
+            Piece square = new(_pieceFactory.CreateNormalPiece("square"));
+            Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
+            Piece triangle = new(_pieceFactory.CreateNormalPiece("triangle"));
+
+            List<Piece> pieces = [square, circle, triangle];
+
+            board.AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
+
+            var cells = board.CellsFromColumnOfPieceType(3, typeof(NormalPieceType));
+
+            Assert.Equal(board.GridHeight, cells.Count);
+            Assert.True(cells.All(cell => cell.Column.Equals(3)));
+        }
+
+        [Fact]
         public void Should_Return_Empty_Cells_From_Column() {
             var board = new Board(8, 7, _mockPieceSelector.Object, _mockSequenceFinder.Object);
             board.PrepareGridCells();

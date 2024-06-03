@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Numerics;
+﻿using System.Numerics;
 using SystemExtensions;
 
 namespace Match3Maker {
@@ -206,7 +205,6 @@ namespace Match3Maker {
         public List<Piece?> LeftCellPiecesFrom(GridCell cell, int distance)
             => LeftCellsFrom(cell, distance).Select(cell => cell.Piece).ToList();
 
-
         public List<GridCell> EmptyCells() => GridCells.SelectMany(cells => cells).Where(cell => cell.IsEmpty()).ToList();
         public List<GridCell> EmptyCellsFromRow(int row) => CellsFromRow(row).Where(cell => cell.IsEmpty()).ToList();
         public List<GridCell> EmptyCellsFromColumn(int column) => CellsFromColumn(column).Where(cell => cell.IsEmpty()).ToList();
@@ -232,6 +230,24 @@ namespace Match3Maker {
             }
 
             return result;
+        }
+
+        public List<GridCell> CellsFromRowOfPieceType(int row, Type type) {
+            return CellsFromRow(row)
+                .Where(cell => cell.HasPiece() && cell.Piece.Type.GetType().Equals(type))
+                .ToList();
+        }
+
+        public List<GridCell> CellsFromColumnOfPieceType(int column, Type type) {
+            return CellsFromColumn(column)
+                .Where(cell => cell.HasPiece() && cell.Piece.Type.GetType().Equals(type))
+                .ToList();
+        }
+
+        public List<GridCell> CellsOfPieceType(Type type) {
+            return GridCells.SelectMany(cells => cells)
+                .Where(cell => cell.HasPiece() && cell.Piece.Type.GetType().Equals(type))
+                .ToList();
         }
 
         public void UpdateGridCellsNeighbours() {
@@ -262,16 +278,12 @@ namespace Match3Maker {
 
                         if (Cell(column, row) is GridCell currentCell && currentCell.IsEmpty()) {
 
-                            if (preSelectedPieces is not null && preSelectedPieces.TryGetValue(currentCell.Position().ToString(), out Piece piece)) {
+                            if (preSelectedPieces is not null && preSelectedPieces.TryGetValue(currentCell.Position().ToString(), out Piece piece))
                                 currentCell.AssignPiece(piece);
-                            }
-                            else {
-                                var piecee = PieceGenerator.Roll(AvailablePieces);
+                            else
+                                currentCell.AssignPiece(PieceGenerator.Roll(AvailablePieces));
 
-                                currentCell.AssignPiece(piecee);
-                            }
                         }
-
                     }
                 }
 
@@ -286,7 +298,6 @@ namespace Match3Maker {
 
             return this;
         }
-
 
         public Dictionary<GridCell, GridCell> Shuffle(IEnumerable<Type>? exceptPieceTypes = null, IEnumerable<GridCell?>? exceptCells = null) {
             exceptPieceTypes ??= [];
@@ -318,9 +329,7 @@ namespace Match3Maker {
                         GridCell targetCell = availableCells.RandomElement();
 
                         targetCell.SwapPieceWith(cell);
-
                         result.Add(targetCell, cell);
-
                         shuffleCells.Add(targetCell);
                     }
                 }
@@ -332,7 +341,7 @@ namespace Match3Maker {
         public void RemoveMatchesFromBoard() {
             var sequences = SequenceFinder.FindBoardSequences(this);
 
-            while (sequences.Any()) {
+            while (sequences.Count > 0) {
                 foreach (Sequence sequence in sequences) {
 
                     foreach (GridCell currentCell in sequence.Cells) {
@@ -343,8 +352,6 @@ namespace Match3Maker {
                             currentCell.RemovePiece();
                             currentCell.AssignPiece(newPiece);
                         }
-
-                        
                     }
                 }
 
