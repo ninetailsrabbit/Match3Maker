@@ -286,6 +286,34 @@ namespace Match3Maker {
             return this;
         }
 
+        public Dictionary<GridCell, GridCell> Shuffle() {
+            List<GridCell> snapshot = GridCells.SelectMany(cells => cells).Where(cell => cell.HasPiece() && !cell.Piece.IsObstacle()).ToList();
+
+            if (GridCells.IsEmpty() || snapshot.IsEmpty())
+                throw new ArgumentException("Board::Shuffle: The board is empty, cannot be shuffled.");
+
+            List<GridCell> shuffleCells = [];
+            Dictionary<GridCell, GridCell> result = [];
+
+            snapshot.Shuffle();
+
+            snapshot.ForEach(cell => {
+                if (!shuffleCells.Contains(cell)) {
+                    shuffleCells.Add(cell);
+
+                    GridCell targetCell = snapshot.Where(cell => !shuffleCells.Contains(cell)).RandomElement();
+
+                    targetCell.SwapPieceWith(cell);
+
+                    result.Add(targetCell, cell);
+
+                    shuffleCells.Add(targetCell);
+                }
+            });
+
+            return result;
+        }
+
         public void RemoveMatchesFromBoard() {
             var sequences = SequenceFinder.FindBoardSequences(this);
 

@@ -1,6 +1,7 @@
 ﻿
 using Match3Maker;
 using Moq;
+using System.Diagnostics;
 using System.Numerics;
 using SystemExtensions;
 using Xunit;
@@ -525,6 +526,42 @@ namespace Match3Tests {
 
             Assert.Equal("special2", board.Cell(5, 3).Piece.Shape);
             Assert.Equal(Piece.TYPES.SPECIAL, board.Cell(1, 1).Piece.Type);
+
+        }
+
+        [Fact]
+        public void Should_Throw_Exception_When_Try_To_Shuffle_An_Empty_Board() {
+            var board = new Board(8, 7);
+
+            Assert.Throws<ArgumentException>(board.Shuffle);
+
+            board.PrepareGridCells(); // Grid cells are ready but no pieces assigned
+
+            Assert.Throws<ArgumentException>(board.Shuffle);
+        }
+
+        [Fact]
+        public void Should_Shuffle_All_Valid_Cells() {
+            Piece square = new("square");
+            Piece circle = new("circle");
+            Piece triangle = new("triangle");
+            Piece prism = new("prism");
+
+            List<Piece> pieces = [square, circle, triangle, prism];
+
+
+            var board = new Board(8, 7);
+
+            board.AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
+
+            Debug.WriteLine(board.GridCells[0][0].Piece.Id);
+
+            var result = board.Shuffle();
+
+            foreach(KeyValuePair<GridCell, GridCell> entry in result) {
+                Assert.NotEqual(entry.Key, entry.Value);
+                Assert.NotEqual(entry.Key.Piece, entry.Value.Piece);
+            }
 
         }
 

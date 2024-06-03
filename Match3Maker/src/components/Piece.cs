@@ -4,7 +4,7 @@ using System.Drawing;
 namespace Match3Maker {
 
 
-    public class Piece : INotifyPropertyChanged, ICloneable, IEquatable<Piece> {
+    public class Piece : INotifyPropertyChanged, ICloneable {
         public enum TYPES {
             NORMAL, SPECIAL, OBSTACLE
         }
@@ -73,10 +73,6 @@ namespace Match3Maker {
                 Locked = Locked,
                 TotalAccumWeight = 0f
             };
-        }
-
-        public bool Equals(Piece? other) {
-            return MatchWith(other);
         }
 
         #region EventHandlers

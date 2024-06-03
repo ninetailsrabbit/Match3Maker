@@ -112,7 +112,7 @@ namespace Match3Maker {
             Vector2 diagonalTopLeft = new(Row - 1, Column - 1);
             Vector2 diagonalBottomRight = new(Row + 1, Column + 1);
             Vector2 diagonalBottomLeft = new(Row + 1, Column - 1);
-
+           
             return cell.InSamePositionAs(diagonalTopRight) ||
                 cell.InSamePositionAs(diagonalTopLeft) ||
                 cell.InSamePositionAs(diagonalBottomRight) ||

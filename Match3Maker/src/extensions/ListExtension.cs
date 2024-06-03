@@ -3,6 +3,54 @@
     public static class ListExtension {
         private static readonly Random _rng = new();
 
+        /// <summary>
+        /// Removes and returns the element at the specified index from the list.
+        /// </summary>
+        /// <param name="sequence">The list to remove the element from.</param>
+        /// <param name="index">The zero-based index of the element to remove.</param>
+        /// <exception cref="ArgumentException">Thrown if the sequence is null or empty.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the index is less than 0 or greater than the last index of the sequence.</exception>
+        /// <returns>The element that was removed at the specified index.</returns>
+        public static T PopAt<T>(this IList<T> sequence, int index) {
+            ArgumentException.ThrowIfNullOrEmpty(nameof(sequence), "Cannot pop at in an empty collection");
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(index, sequence.LastIndex());
+
+            var result = sequence[index];
+            sequence.RemoveAt(index);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Removes and returns the first element from the list.
+        /// </summary>
+        /// <param name="sequence">The list to remove the element from.</param>
+        /// <exception cref="ArgumentException">Thrown if the sequence is null or empty.</exception>
+        /// <returns>The first element of the list.</returns>
+        public static T PopFront<T>(this IList<T> sequence) {
+            ArgumentException.ThrowIfNullOrEmpty(nameof(sequence), "Cannot pop front an empty collection");
+
+            var result = sequence.First();
+            sequence.RemoveAt(0);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Removes and returns the last element from the list.
+        /// </summary>
+        /// <param name="sequence">The list to remove the element from.</param>
+        /// <exception cref="ArgumentException">Thrown if the sequence is null or empty.</exception>
+        /// <returns>The last element of the list.</returns>
+        public static T PopBack<T>(this IList<T> sequence) {
+            ArgumentException.ThrowIfNullOrEmpty(nameof(sequence), "Cannot pop back an empty collection");
+
+            var result = sequence[^1];
+            sequence.RemoveAt(sequence.LastIndex());
+
+            return result;
+        }
+
         public static int LastIndex<T>(this IEnumerable<T> sequence) => sequence.Count() - 1;
 
         /// <summary>
