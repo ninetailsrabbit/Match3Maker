@@ -4,6 +4,8 @@ using Xunit;
 
 namespace Match3Tests {
     public class GridCellTests {
+        private readonly PieceFactory _pieceFactory = new();
+
         [Fact]
         public void Should_Be_Created_With_Correct_Properties() {
             var cell = new GridCell(0, 5);
@@ -88,7 +90,7 @@ namespace Match3Tests {
         [Fact]
         public void Should_Detect_Piece() {
             var cell = new GridCell(1, 1);
-            var piece = new Piece("square");
+            var piece = new Piece(_pieceFactory.CreateNormalPiece("square"));
 
             Assert.True(cell.IsEmpty());
 
@@ -100,8 +102,8 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Not_Swap_Piece_When_Conditions_Are_Not_Met() {
-            var squarePiece = new Piece("square");
-            var circlePiece = new Piece("circle");
+            var squarePiece = new Piece(_pieceFactory.CreateNormalPiece("square"));
+            var circlePiece = new Piece(_pieceFactory.CreateNormalPiece("circle"));
 
             var cell = new GridCell(1, 1);
             var otherCell = new GridCell(1, 2);
@@ -123,8 +125,8 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Swap_Piece_When_Both_Cells_Has_One_And_Met_Conditions() {
-            var squarePiece = new Piece("square");
-            var circlePiece = new Piece("circle");
+            var squarePiece = new Piece(_pieceFactory.CreateNormalPiece("square"));
+            var circlePiece = new Piece(_pieceFactory.CreateNormalPiece("circle"));
 
             var cell = new GridCell(1, 1, squarePiece);
             var otherCell = new GridCell(1, 2, circlePiece);
@@ -137,8 +139,8 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Raise_Swapped_Piece_Event_When_Swaps() {
-            var squarePiece = new Piece("square");
-            var circlePiece = new Piece("circle");
+            var squarePiece = new Piece(_pieceFactory.CreateNormalPiece("square"));
+            var circlePiece = new Piece(_pieceFactory.CreateNormalPiece("circle"));
 
             var cell = new GridCell(1, 1, squarePiece);
             var otherCell = new GridCell(1, 2, circlePiece);
@@ -170,7 +172,7 @@ namespace Match3Tests {
         [Fact]
         public void Should_Raise_Swap_Rejected_Event_When_Swap_Cannot_Be_Done() {
 
-            var cell = new GridCell(1, 1, new Piece("square"));
+            var cell = new GridCell(1, 1, new Piece(_pieceFactory.CreateNormalPiece("square")));
             var otherCell = new GridCell(1, 2);
 
             List<GridCell> cellEvent = [];
@@ -187,7 +189,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Detect_Adjacent_Diagonal_Cells() {
-            var cell = new GridCell(3, 4, new Piece("square"));
+            var cell = new GridCell(3, 4, new Piece(_pieceFactory.CreateNormalPiece("square")));
 
             var diagonalTopRightCell = new GridCell(4, 3);
             var diagonalTopLeftCell = new GridCell(2, 3);
@@ -211,7 +213,7 @@ namespace Match3Tests {
         [Fact]
         public void Should_Remove_Piece_And_Return_It() {
             var cell = new GridCell(3, 4);
-            var piece = new Piece("square");
+            var piece = new Piece(_pieceFactory.CreateNormalPiece("square"));
 
             Assert.True(cell.IsEmpty());
             Assert.Null(cell.RemovePiece());

@@ -1,16 +1,18 @@
 ﻿
 using Match3Maker;
 using Moq;
-using System.Diagnostics;
 using System.Numerics;
 using SystemExtensions;
 using Xunit;
 
 namespace Match3Tests {
 
+
+
     public class BoardTests {
         private readonly Mock<IPieceGenerator> _mockPieceSelector = new();
         private readonly Mock<ISequenceFinder> _mockSequenceFinder = new();
+        private readonly PieceFactory _pieceFactory = new();
 
         [Fact]
         public void Can_Be_Created_With_Static_Constructor() {
@@ -386,8 +388,8 @@ namespace Match3Tests {
 
             Assert.Equal(board.GridHeight, board.EmptyCellsFromColumn(0).Count);
 
-            board.Cell(0, 0)?.AssignPiece(new Piece("circle"));
-            board.Cell(0, 1)?.AssignPiece(new Piece("circle"));
+            board.Cell(0, 0)?.AssignPiece(new Piece(_pieceFactory.CreateNormalPiece("circle")));
+            board.Cell(0, 1)?.AssignPiece(new Piece(_pieceFactory.CreateNormalPiece("circle")));
 
             Assert.Equal(board.GridHeight - 2, board.EmptyCellsFromColumn(0).Count);
         }
@@ -399,8 +401,8 @@ namespace Match3Tests {
 
             Assert.Equal(board.GridWidth, board.EmptyCellsFromRow(0).Count);
 
-            board.Cell(0, 0)?.AssignPiece(new Piece("circle"));
-            board.Cell(1, 0)?.AssignPiece(new Piece("circle"));
+            board.Cell(0, 0)?.AssignPiece(new Piece(_pieceFactory.CreateNormalPiece("circle")));
+            board.Cell(1, 0)?.AssignPiece(new Piece(_pieceFactory.CreateNormalPiece("circle")));
 
             Assert.Equal(board.GridWidth - 2, board.EmptyCellsFromRow(0).Count);
         }
@@ -411,7 +413,7 @@ namespace Match3Tests {
             board.PrepareGridCells();
 
             var cell = board.Cell(2, 5);
-            var piece = new Piece("circle");
+            var piece = new Piece(_pieceFactory.CreateNormalPiece("circle"));
 
             Assert.Null(board.FindGridCellWithPiece(piece));
 
@@ -424,8 +426,8 @@ namespace Match3Tests {
         public void Should_Add_Available_Pieces() {
             var board = new Board(8, 7, _mockPieceSelector.Object);
 
-            List<Piece> pieces = [new Piece("square"), new Piece("circle")];
-            Piece trianglePiece = new("triangle");
+            List<Piece> pieces = [new Piece(_pieceFactory.CreateNormalPiece("square")), new Piece(_pieceFactory.CreateNormalPiece("circle"))];
+            Piece trianglePiece = new(_pieceFactory.CreateNormalPiece("triangle"));
 
             Assert.Empty(board.AvailablePieces);
 
@@ -448,9 +450,9 @@ namespace Match3Tests {
         public void Should_Remove_Available_Pieces() {
             var board = new Board(8, 7, _mockPieceSelector.Object);
 
-            Piece square = new("square");
-            Piece circle = new("circle");
-            Piece triangle = new("triangle");
+            Piece square = new(_pieceFactory.CreateNormalPiece("square"));
+            Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
+            Piece triangle = new(_pieceFactory.CreateNormalPiece("triangle"));
 
             List<Piece> pieces = [square, circle, triangle];
 
@@ -461,7 +463,7 @@ namespace Match3Tests {
             board.RemoveAvailablePiece(circle);
 
             Assert.Equal(2, board.AvailablePieces.Count);
-            Assert.True(board.AvailablePieces.All(piece => !piece.Shape.Equals("circle")));
+            Assert.True(board.AvailablePieces.All(piece => !piece.Type.Shape.Equals("circle")));
 
             board.RemoveAvailablePieces(pieces);
 
@@ -480,11 +482,12 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Not_Have_Matches_When_Fill_Board_And_No_Matches_Is_True() {
-            Piece square = new("square");
-            Piece circle = new("circle");
-            Piece triangle = new("triangle");
+            Piece square = new(_pieceFactory.CreateNormalPiece("square"));
+            Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
+            Piece triangle = new(_pieceFactory.CreateNormalPiece("triangle"));
+            Piece prism = new(_pieceFactory.CreateNormalPiece("prism"));
 
-            List<Piece> pieces = [square, circle, triangle];
+            List<Piece> pieces = [square, circle, triangle, prism];
 
             var board = new Board(8, 7);
 
@@ -498,34 +501,31 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Assign_Preselected_Pieces_When_Fill_The_Board() {
-            Piece square = new("square");
-            Piece circle = new("circle");
-            Piece triangle = new("triangle");
+            Piece square = new(_pieceFactory.CreateNormalPiece("square"));
+            Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
+            Piece triangle = new(_pieceFactory.CreateNormalPiece("triangle"));
 
             List<Piece> pieces = [square, circle, triangle];
 
-            _mockPieceSelector.Setup(mock => mock.Roll(pieces, null)).Returns(pieces.RandomElement());
-            _mockPieceSelector.Setup(mock => mock.Roll(pieces, new Piece.TYPES[] { Piece.TYPES.NORMAL })).Returns(pieces.RandomElement());
-
-            var board = new Board(8, 7, _mockPieceSelector.Object);
+            var board = new Board(8, 7);
 
             board.AddAvailablePieces(pieces);
 
             board.PrepareGridCells().FillInitialBoard(
                 false,
                 new() {
-                    { new Vector2(1, 1).ToString(), new Piece("special", Piece.TYPES.SPECIAL) },
-                    { new Vector2(3, 5).ToString(), new Piece("special2", Piece.TYPES.SPECIAL) },
+                    { new Vector2(1, 1).ToString(), new Piece(_pieceFactory.CreateSpecialPiece("special")) },
+                    { new Vector2(3, 5).ToString(), new Piece(_pieceFactory.CreateSpecialPiece("special2")) },
                 }
             );
 
             Assert.Empty(board.EmptyCells());
 
-            Assert.Equal("special", board.Cell(1, 1).Piece.Shape);
-            Assert.Equal(Piece.TYPES.SPECIAL, board.Cell(1, 1).Piece.Type);
+            Assert.Equal("special", board.Cell(1, 1).Piece.Type.Shape);
+            Assert.Equal(typeof(SpecialPieceType), board.Cell(1, 1).Piece.Type.GetType());
 
-            Assert.Equal("special2", board.Cell(5, 3).Piece.Shape);
-            Assert.Equal(Piece.TYPES.SPECIAL, board.Cell(1, 1).Piece.Type);
+            Assert.Equal("special2", board.Cell(5, 3).Piece.Type.Shape);
+            Assert.Equal(typeof(SpecialPieceType), board.Cell(5, 3).Piece.Type.GetType());
 
         }
 
@@ -542,10 +542,10 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Shuffle_All_Valid_Cells() {
-            Piece square = new("square");
-            Piece circle = new("circle");
-            Piece triangle = new("triangle");
-            Piece prism = new("prism");
+            Piece square = new(_pieceFactory.CreateNormalPiece("square"));
+            Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
+            Piece triangle = new(_pieceFactory.CreateNormalPiece("triangle"));
+            Piece prism = new(_pieceFactory.CreateNormalPiece("prism"));
 
             List<Piece> pieces = [square, circle, triangle, prism];
 
@@ -555,7 +555,7 @@ namespace Match3Tests {
 
             var result = board.Shuffle();
 
-            foreach(KeyValuePair<GridCell, GridCell> entry in result) {
+            foreach (KeyValuePair<GridCell, GridCell> entry in result) {
                 Assert.NotEqual(entry.Key, entry.Value);
                 Assert.NotEqual(entry.Key.Piece, entry.Value.Piece);
             }

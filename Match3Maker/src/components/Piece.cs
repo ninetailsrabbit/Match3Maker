@@ -1,21 +1,13 @@
 ﻿using System.ComponentModel;
-using System.Drawing;
 
 namespace Match3Maker {
-
-
-    public class Piece : INotifyPropertyChanged, ICloneable {
-        public enum TYPES {
-            NORMAL, SPECIAL, OBSTACLE
-        }
+    public class Piece(IPieceType type, float weight = 1f) : INotifyPropertyChanged, ICloneable {
 
         #region Properties
         public Guid Id = Guid.NewGuid();
-        public TYPES Type;
-        public string Shape;
-        public Color? Color;
+        public IPieceType Type = type;
 
-        public float Weight = 1f;
+        public float Weight = weight;
         public float TotalAccumWeight = 0f;
 
         public bool Locked {
@@ -29,17 +21,7 @@ namespace Match3Maker {
 
         private bool _locked = false;
 
-        public Piece(string shape, TYPES type = TYPES.NORMAL, float weight = 1f) {
-            Shape = shape;
-            Type = type;
-            Weight = weight;
-
-            if (type.Equals(TYPES.OBSTACLE))
-                Lock();
-        }
-
-        public static Piece Create(string shape, TYPES type = TYPES.NORMAL, float weight = 1f)
-            => new(shape, type, weight);
+        public static Piece Create(IPieceType type, float weight = 1f) => new(type, weight);
 
         #endregion
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -47,19 +29,12 @@ namespace Match3Maker {
         public void ResetAccumWeight() {
             TotalAccumWeight = 0f;
         }
-        public bool IsNormal() => Type.Equals(TYPES.NORMAL);
-        public bool IsSpecial() => Type.Equals(TYPES.SPECIAL);
-        public bool IsObstacle() => Type.Equals(TYPES.OBSTACLE);
 
-        public bool MatchWith(Piece piece)
-            => Type.Equals(piece.Type)
-            && Shape.Trim().Equals(piece.Shape, StringComparison.OrdinalIgnoreCase)
-            && Color.Equals(piece.Color);
+        public bool MatchWith(Piece piece) => Type.MatchWith(piece);
 
         public bool NotMatchWith(Piece piece) => !MatchWith(piece);
 
         public void Lock() {
-
             Locked = true;
         }
 
@@ -68,8 +43,7 @@ namespace Match3Maker {
         }
 
         public object Clone() {
-            return new Piece(Shape, Type, Weight) {
-                Color = Color,
+            return new Piece(Type, Weight) {
                 Locked = Locked,
                 TotalAccumWeight = 0f
             };

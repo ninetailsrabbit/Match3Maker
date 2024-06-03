@@ -1,11 +1,12 @@
-﻿using SystemExtensions;
+﻿using System.Diagnostics;
+using SystemExtensions;
 
 namespace Match3Maker {
     public sealed class PieceWeightGenerator : IPieceGenerator {
         private readonly Random _rng = new();
 
 #nullable enable
-        public Piece Roll(List<Piece> pieces, IEnumerable<Piece.TYPES>? only = null) {
+        public Piece Roll(List<Piece> pieces, IEnumerable<IPieceType>? only = null) {
             if (pieces.IsEmpty())
                 throw new ArgumentException("PieceWeightGenerator: The pieces to roll cannot be empty");
 
@@ -13,8 +14,10 @@ namespace Match3Maker {
             Piece? selectedPiece = null;
 
             var selectedPieces = only is not null ?
-                pieces.Where(piece => piece.Type.In(only)) :
-                pieces.Where(piece => piece.IsNormal());
+                pieces.Where(piece => only.Select(pieceType => pieceType.GetType()).ToList().Contains(piece.Type.GetType())) :
+                pieces;
+
+            ArgumentOutOfRangeException.ThrowIfZero(selectedPieces.Count());
 
             do {
                 pieces.Shuffle();
@@ -42,6 +45,7 @@ namespace Match3Maker {
             foreach (Piece piece in selectedPieces)
                 piece.ResetAccumWeight();
 
+            Debug.WriteLine(selectedPiece.Type.Shape);
             return selectedPiece;
         }
     }

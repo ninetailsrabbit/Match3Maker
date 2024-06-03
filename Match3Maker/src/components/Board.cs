@@ -287,7 +287,7 @@ namespace Match3Maker {
         }
 
         public Dictionary<GridCell, GridCell> Shuffle() {
-            List<GridCell> snapshot = GridCells.SelectMany(cells => cells).Where(cell => cell.HasPiece() && !cell.Piece.IsObstacle()).ToList();
+            List<GridCell> snapshot = GridCells.SelectMany(cells => cells).Where(cell => cell.HasPiece() && cell.Piece.Type.CanBeShuffled()).ToList();
 
             if (GridCells.IsEmpty() || snapshot.IsEmpty())
                 throw new ArgumentException("Board::Shuffle: The board is empty, cannot be shuffled.");
@@ -321,12 +321,16 @@ namespace Match3Maker {
                 foreach (Sequence sequence in sequences) {
 
                     foreach (GridCell currentCell in sequence.Cells) {
-                        var otherShapes = sequence.Cells.Where(cell => !cell.Equals(cell)).Select(cell => cell.Piece.Shape);
+                        var otherShapes = sequence.Cells.Where(cell => !cell.Equals(currentCell)).Select(cell => cell.Piece.Type.Shape);
 
-                        Piece.TYPES pieceType = currentCell.Piece.Type;
+                        IPieceType pieceType = currentCell.Piece.Type;
 
                         currentCell.RemovePiece();
-                        currentCell.AssignPiece(PieceGenerator.Roll(AvailablePieces.Where(piece => !otherShapes.Contains(piece.Shape)).ToList(), [pieceType]));
+                        currentCell.AssignPiece(
+                            PieceGenerator.Roll(AvailablePieces
+                            .Where(piece => !otherShapes.Contains(piece.Type.Shape))
+                            .ToList(), [pieceType])
+                        );
                     }
                 }
 

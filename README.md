@@ -22,6 +22,7 @@ This lightweight library provides the core logic and functionality you need to b
   - [Components](#components)
     - [GridCell](#gridcell)
     - [Piece](#piece)
+      - [Creating new piece types](#creating-new-piece-types)
     - [Sequence](#sequence)
     - [Board](#board)
 
@@ -140,6 +141,15 @@ public bool Equals(GridCell? other) {
 ```
 
 ### Piece
+
+A core Piece that manage most of the logic when it comes to interact with. It can be easily extended providing your own types so you're free to decide which one match and which one not.
+
+#### Creating new piece types
+
+```csharp
+
+
+```
 
 ### Sequence
 

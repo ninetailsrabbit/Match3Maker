@@ -5,43 +5,31 @@ using Xunit;
 namespace Match3Tests {
     public class PieceTests {
 
+        private readonly PieceFactory _pieceFactory = new();
+
         [Fact]
         public void Should_Be_Normal_And_Unlocked_On_Default_Initialization() {
-            var piece = new Piece("square", Piece.TYPES.NORMAL);
+            var piece = new Piece(_pieceFactory.CreateNormalPiece("square"));
 
-            Assert.Equal(Piece.TYPES.NORMAL, piece.Type);
+            Assert.Equal(typeof(NormalPieceType), piece.Type.GetType());
             Assert.False(piece.Locked);
         }
 
         [Fact]
         public void Should_Be_Created_From_Static_Constructor() {
-            var piece = new Piece("circle", Piece.TYPES.NORMAL, 2.5f);
+            var piece = new Piece(_pieceFactory.CreateNormalPiece("circle"), 2.5f);
 
-            Assert.Equal(Piece.TYPES.NORMAL, piece.Type);
-            Assert.Equal("circle", piece.Shape);
+            Assert.Equal(typeof(NormalPieceType), piece.Type.GetType());
+
+            Assert.Equal("circle", piece.Type.Shape);
             Assert.False(piece.Locked);
-        }
-
-        [Fact]
-        public void Should_Be_Initialized_Correctly() {
-            var pieceA = new Piece("square", Piece.TYPES.OBSTACLE);
-
-            Assert.Equal("square", pieceA.Shape);
-            Assert.Equal(Piece.TYPES.OBSTACLE, pieceA.Type);
-            Assert.True(pieceA.Locked);
-
-            var pieceB = new Piece("square", Piece.TYPES.NORMAL);
-
-            Assert.Equal("square", pieceB.Shape);
-            Assert.Equal(Piece.TYPES.NORMAL, pieceB.Type);
-            Assert.False(pieceB.Locked);
         }
 
         [Fact]
         public void Should_Be_Notify_When_Locked_Property_Changes() {
             List<string?> receivedEvents = [];
 
-            var piece = new Piece("square");
+            var piece = new Piece(_pieceFactory.CreateNormalPiece("square"));
 
             piece.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e) {
                 receivedEvents.Add(e.PropertyName);
@@ -59,15 +47,14 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Match_With_Similar_Pieces() {
-            var piece = new Piece("square");
-            var piece2 = new Piece("SquAre");
-            var piece3 = new Piece("circle");
-            var piece4 = new Piece("square", Piece.TYPES.SPECIAL);
-
+            var piece = new Piece(_pieceFactory.CreateNormalPiece("square"));
+            var piece2 = new Piece(_pieceFactory.CreateNormalPiece("SquAre"));
+            var piece3 = new Piece(_pieceFactory.CreateNormalPiece("circle"));
+            var piece4 = new Piece(_pieceFactory.CreateSpecialPiece("square"));
 
             Assert.True(piece.MatchWith(piece2));
             Assert.False(piece.MatchWith(piece3));
-            Assert.False(piece.MatchWith(piece4));
+            Assert.True(piece.MatchWith(piece4));
         }
 
     }
