@@ -368,6 +368,9 @@ board.AddAvailablePieces(pieces)
      .FillInitialBoard(false); // public Board FillInitialBoard(bool allowMatchesOnStart = false, Dictionary<string, Piece>? preSelectedPieces = null)
 
 
+// This function run when PreparedGridCells is used, assign the neighbour cells for all of them in the board.
+// This function is rarely called manually but here it is in case you want to update the cells,  change their size or want to prepare them manually.
+board.UpgradeGridCellsNeighbours();
 
 // You can change properties any time
 board.ChangeGridWidth(7)
@@ -413,7 +416,7 @@ board.EmptyCellsFromColumn(2);
 // Get cells that contains a piece of selected type
 board.CellsFromRowOfPieceType(2, typeof(SpecialPieceType));
 board.CellsFromColumnOfPieceType(1, typeof(NormalPieceType));
-board.CellsOfPieceType(typeof(NormalPieceType));
+board.CellsWithPieceType(typeof(NormalPieceType));
 
 // Returns the 2 upper cells from the origin one provided, only returns the valid cells,
 // it will never go out of bounds even if you use large numbers or out of range of that cell.
@@ -430,12 +433,20 @@ board.LeftCellsPiecesFrom(board.Cell(7, 2), 3);
 
 
 // Find a grid cell that contains the piece provided, it uses the Id property internally for the search.
-var piece = new Piece(new NormalPieceType("circle"));
+// The piece instance provided on this method must be already assigned to a cell in the board.
 board.FindGridCellWithPiece(piece);
 //Or
 board.FindGridCellWithPiece(piece.Id);
 board.FindGridCellWithPiece(piece.Id.ToString());
 
+// Shuffle a board and returns a Dictionary<GridCell, GridCell> with the grid cells affected
+// The Key GridCell means that has changed piece with the Value GridCell (can be read as the opposite also)
+// Pieces with a IPieceType where CanBeShuffled() returns false are not affected in this process.
+var result = board.Shuffle();
 
+
+// Remove current matches from board, used internally when FilledInitialBoard() is called
+// This remove the current sequences and create new pieces so the board does not have any current sequences active.
+board.RemoveMatchesFromBoard();
 
 ```

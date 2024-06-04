@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using Xunit;
 
-namespace Match3Tests {
+namespace Match3MakerTests {
     public class PieceTests {
 
         private readonly PieceFactory _pieceFactory = new();

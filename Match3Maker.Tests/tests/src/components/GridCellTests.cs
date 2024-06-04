@@ -2,7 +2,7 @@
 using System.Numerics;
 using Xunit;
 
-namespace Match3Tests {
+namespace Match3MakerTests {
     public class GridCellTests {
         private readonly PieceFactory _pieceFactory = new();
 

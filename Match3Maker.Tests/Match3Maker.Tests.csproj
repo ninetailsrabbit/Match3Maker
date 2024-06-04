@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
-		<RootNamespace>Match3Maker</RootNamespace>
+		<RootNamespace>Match3Maker.Tests</RootNamespace>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<EnableDynamicLoading>true</EnableDynamicLoading>
@@ -13,29 +13,38 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<Title>Ninetailsrabbit.Match3Maker</Title>
+		<Title>Ninetailsrabbit.Match3Maker.Tests</Title>
 		<Version>1.0.0</Version>
 		<Description>This lightweight library provides the core logic and functionality you need to build engaging match-3 games. Focus on game design and mechanics while leaving the complex logic to this library</Description>
 		<Copyright>© 2024 Ninetailsrabbit</Copyright>
 		<Authors>Ninetailsrabbit</Authors>
 		<Company>Ninetailsrabbit</Company>
 
-		<PackageId>Ninetailsrabbit.Match3Maker</PackageId>
+		<PackageId>Ninetailsrabbit.Match3Maker.Tests</PackageId>
 		<PackageReleaseNotes>Ninetailsrabbit.Match3Maker release.</PackageReleaseNotes>
 		<PackageTags>godot,plugin,extensions,csharp,gamedev,gamedevelopment,match3,puzzle</PackageTags>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageProjectUrl>https://www.nuget.org/packages/Ninetailsrabbit.Match3Maker/</PackageProjectUrl>
 
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/ninetailsrabbit/Match3Maker</RepositoryUrl>
-		<PackageIcon>icon.png</PackageIcon>
 	</PropertyGroup>
-
+	
 	<ItemGroup>
-		<None Include="../README.md" Pack="true" PackagePath="\" />
-		<None Include="../LICENSE" Pack="true" PackagePath="\" />
-		<None Include="icon.png" Pack="True" PackagePath="" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+		<PackageReference Include="Moq" Version="4.20.70" />
+		<PackageReference Include="xunit" Version="2.8.1" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.8.1">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="coverlet.collector" Version="6.0.2">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\Match3Maker\Match3Maker.csproj" />
 	</ItemGroup>
 
 </Project>

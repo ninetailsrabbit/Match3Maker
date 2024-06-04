@@ -341,7 +341,7 @@ namespace Match3Maker {
                 .ToList();
         }
 
-        public List<GridCell> CellsOfPieceType(Type type) {
+        public List<GridCell> CellsWithPieceType(Type type) {
             return GridCells.SelectMany(cells => cells)
                 .Where(cell => cell.HasPiece() && cell.Piece.Type.GetType().Equals(type))
                 .ToList();

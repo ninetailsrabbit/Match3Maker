@@ -1,7 +1,7 @@
 ﻿using Match3Maker;
 using System.Drawing;
 
-namespace Match3Tests {
+namespace Match3MakerTests {
     public class PieceFactory {
         public IPieceType CreateNormalPiece(string shape, Color? color = null) {
             return new NormalPieceType(shape, color);

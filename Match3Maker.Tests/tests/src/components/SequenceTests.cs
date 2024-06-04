@@ -1,7 +1,7 @@
 ﻿using Match3Maker;
 using Xunit;
 
-namespace Match3Tests {
+namespace Match3MakerTests {
     public class SequenceTests {
         private readonly PieceFactory _pieceFactory = new();
 

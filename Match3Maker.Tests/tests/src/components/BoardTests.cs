@@ -4,7 +4,7 @@ using Moq;
 using System.Numerics;
 using Xunit;
 
-namespace Match3Tests {
+namespace Match3MakerTests {
 
 
 
@@ -434,7 +434,7 @@ namespace Match3Tests {
 
             board.AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
 
-            var cells = board.CellsOfPieceType(typeof(NormalPieceType));
+            var cells = board.CellsWithPieceType(typeof(NormalPieceType));
 
             Assert.Empty(board.EmptyCells());
             Assert.Equal(board.Dimensions(), cells.Count);
@@ -515,6 +515,8 @@ namespace Match3Tests {
             cell?.AssignPiece(piece);
 
             Assert.Equal(cell, board.FindGridCellWithPiece(piece));
+            Assert.Equal(cell, board.FindGridCellWithPiece(piece.Id));
+            Assert.Equal(cell, board.FindGridCellWithPiece(piece.Id.ToString()));
         }
 
         [Fact]
