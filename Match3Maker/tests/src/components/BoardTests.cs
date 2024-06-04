@@ -18,7 +18,7 @@ namespace Match3Tests {
             int width = 5;
             int height = 6;
 
-            var board = Board.Create(width, height, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            var board = Board.Create(width, height, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
 
             Assert.Equal(width, board.GridWidth);
             Assert.Equal(height, board.GridHeight);
@@ -26,7 +26,7 @@ namespace Match3Tests {
 
             Vector2 size = new(10, 7);
 
-            board = Board.Create(size, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            board = Board.Create(size, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
 
             Assert.Equal((int)size.X, board.GridWidth);
             Assert.Equal((int)size.Y, board.GridHeight);
@@ -34,11 +34,49 @@ namespace Match3Tests {
         }
 
         [Fact]
+        public void Should_Raise_Spent_All_Movements_Event_Once_When_Remaining_Moves_Reach_Zero() {
+            var board = Board.Create(5, 5, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+
+            List<string> receivedEvents = [];
+
+            void listener() {
+                receivedEvents.Add("SpentMoves");
+            }
+
+            board.SpentAllMovements += listener;
+
+            Assert.Equal(10, board.RemainingMoves);
+            board.ChangeRemainingMoves(7);
+
+            Assert.Equal(7, board.RemainingMoves);
+
+            board.DecreaseMoves(3);
+
+            Assert.Equal(4, board.RemainingMoves);
+
+            board.IncreaseMoves(3);
+
+            Assert.Equal(7, board.RemainingMoves);
+
+            board.DecreaseMoves(7);
+
+            Assert.Equal(0, board.RemainingMoves);
+
+            board.DecreaseMoves(100);
+
+            // Cannot go below zero and events should be raised once only when previous value was not zero
+            Assert.Equal(0, board.RemainingMoves);
+
+            Assert.Single(receivedEvents);
+            Assert.Equal("SpentMoves", receivedEvents.First());
+        }
+
+        [Fact]
         public void Grid_Dimensions_Are_Set_Correctly_On_New_Board() {
             int width = 5;
             int height = 6;
 
-            var board = new Board(width, height, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            var board = new Board(width, height, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
 
             Assert.Equal(width, board.GridWidth);
             Assert.Equal(height, board.GridHeight);
@@ -60,7 +98,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Grid_Dimensions_Are_Clamped_ToMin() {
-            var board = new Board(2, 1, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            var board = new Board(2, 1, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
 
             Assert.Equal(Board.MIN_GRID_WIDTH, board.GridWidth);
             Assert.Equal(Board.MIN_GRID_HEIGHT, board.GridHeight);
@@ -69,7 +107,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Be_Able_To_Generate_Grid_Cells_Based_On_Size() {
-            var board = new Board(8, 7, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            var board = new Board(8, 7, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
 
             Assert.Empty(board.GridCells);
 
@@ -87,7 +125,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Be_Able_To_Overwrite_Grid_Cells_When_Size_Is_Changed_And_Overwrite_Is_True() {
-            var board = new Board(8, 7, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            var board = new Board(8, 7, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
 
             Assert.Empty(board.GridCells);
 
@@ -104,7 +142,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Assign_Neighbours_On_Prepared_Grid_Cells() {
-            var board = new Board(8, 7, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            var board = new Board(8, 7, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
 
             Assert.Empty(board.GridCells);
 
@@ -170,7 +208,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Detect_Border_And_Corners() {
-            var board = new Board(8, 7, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            var board = new Board(8, 7, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
 
             Assert.Empty(board.GridCells);
 
@@ -214,7 +252,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Raise_Prepared_Board_Event_When_Prepared_Grid_Cells() {
-            var board = new Board(5, 6, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            var board = new Board(5, 6, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
 
             List<string> receivedEvents = [];
 
@@ -234,7 +272,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Return_Adjacent_Cells_Or_Null_When_Requested() {
-            var board = new Board(4, 5, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            var board = new Board(4, 5, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
             board.PrepareGridCells();
 
             Assert.Null(board.Cell(6, 3));
@@ -270,7 +308,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Return_Upper_Cells_From_Selected_Cell() {
-            var board = new Board(4, 5, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            var board = new Board(4, 5, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
             board.PrepareGridCells();
 
             var originCell = board.Cell(2, 4);
@@ -288,7 +326,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Return_Right_Cells_From_Selected_Cell() {
-            var board = new Board(4, 5, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            var board = new Board(4, 5, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
             board.PrepareGridCells();
 
             var originCell = board.Cell(0, 2);
@@ -306,7 +344,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Return_Left_Cells_From_Selected_Cell() {
-            var board = new Board(4, 5, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            var board = new Board(4, 5, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
             board.PrepareGridCells();
 
             var originCell = board.Cell(3, 1);
@@ -325,7 +363,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Return_Bottoms_Cells_From_Selected_Cell() {
-            var board = new Board(4, 5, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            var board = new Board(4, 5, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
             board.PrepareGridCells();
 
             var originCell = board.Cell(1, 0);
@@ -343,7 +381,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Return_Selected_Row_Cells() {
-            var board = new Board(8, 7, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            var board = new Board(8, 7, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
             board.PrepareGridCells();
 
             var rowCells = board.CellsFromRow(1);
@@ -363,7 +401,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Return_Selected_Column_Cells() {
-            var board = new Board(8, 7, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            var board = new Board(8, 7, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
             board.PrepareGridCells();
 
             var columnCells = board.CellsFromColumn(1);
@@ -382,7 +420,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Return_Selected_Pieces_Of_Type() {
-            var board = new Board(8, 7);
+            var board = new Board(8, 7, 10);
 
             Piece square = new(_pieceFactory.CreateNormalPiece("square"));
             Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
@@ -400,7 +438,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Return_Selected_Row_Pieces_Of_Type() {
-            var board = new Board(8, 7);
+            var board = new Board(8, 7, 10);
 
             Piece square = new(_pieceFactory.CreateNormalPiece("square"));
             Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
@@ -418,7 +456,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Return_Selected_Column_Pieces_Of_Type() {
-            var board = new Board(8, 7);
+            var board = new Board(8, 7, 10);
 
             Piece square = new(_pieceFactory.CreateNormalPiece("square"));
             Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
@@ -436,7 +474,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Return_Empty_Cells_From_Column() {
-            var board = new Board(8, 7, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            var board = new Board(8, 7, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
             board.PrepareGridCells();
 
             Assert.Equal(board.GridHeight, board.EmptyCellsFromColumn(0).Count);
@@ -449,7 +487,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Return_Empty_Cells_From_Row() {
-            var board = new Board(8, 7, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            var board = new Board(8, 7, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
             board.PrepareGridCells();
 
             Assert.Equal(board.GridWidth, board.EmptyCellsFromRow(0).Count);
@@ -462,7 +500,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Find_The_GridCell_Related_To_Piece() {
-            var board = new Board(8, 7, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            var board = new Board(8, 7, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
             board.PrepareGridCells();
 
             var cell = board.Cell(2, 5);
@@ -477,7 +515,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Add_Available_Pieces() {
-            var board = new Board(8, 7, _mockPieceSelector.Object);
+            var board = new Board(8, 7, 10, _mockPieceSelector.Object);
 
             List<Piece> pieces = [new Piece(_pieceFactory.CreateNormalPiece("square")), new Piece(_pieceFactory.CreateNormalPiece("circle"))];
             Piece trianglePiece = new(_pieceFactory.CreateNormalPiece("triangle"));
@@ -501,7 +539,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Remove_Available_Pieces() {
-            var board = new Board(8, 7, _mockPieceSelector.Object);
+            var board = new Board(8, 7, 10, _mockPieceSelector.Object);
 
             Piece square = new(_pieceFactory.CreateNormalPiece("square"));
             Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
@@ -525,7 +563,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Not_Fill_The_Board_When_Grid_Cells_Are_Empty() {
-            var board = new Board(8, 7, _mockPieceSelector.Object);
+            var board = new Board(8, 7, 10, _mockPieceSelector.Object);
 
             Assert.Empty(board.GridCells);
 
@@ -542,7 +580,7 @@ namespace Match3Tests {
 
             List<Piece> pieces = [square, circle, triangle, prism];
 
-            var board = new Board(8, 7);
+            var board = new Board(8, 7, 10);
 
             board.AddAvailablePieces(pieces);
 
@@ -560,7 +598,7 @@ namespace Match3Tests {
 
             List<Piece> pieces = [square, circle, triangle];
 
-            var board = new Board(8, 7);
+            var board = new Board(8, 7, 10);
 
             board.AddAvailablePieces(pieces);
 
@@ -584,7 +622,7 @@ namespace Match3Tests {
 
         [Fact]
         public void Should_Throw_Exception_When_Try_To_Shuffle_An_Empty_Board() {
-            var board = new Board(8, 7);
+            var board = new Board(8, 7, 10);
 
             Assert.Throws<ArgumentException>(() => board.Shuffle());
 
@@ -602,7 +640,7 @@ namespace Match3Tests {
 
             List<Piece> pieces = [square, circle, triangle, prism];
 
-            var board = new Board(8, 7);
+            var board = new Board(8, 7, 10);
 
             board.AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
 
@@ -625,7 +663,7 @@ namespace Match3Tests {
 
             List<Piece> pieces = [square, circle, triangle, prism, special];
 
-            var board = new Board(8, 7);
+            var board = new Board(8, 7, 10);
 
             board.AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
 

@@ -18,6 +18,7 @@ namespace Match3Maker {
         #region Events
         public event Action? PreparedBoard;
         public event Action? FilledBoard;
+        public event Action? SpentAllMovements;
 
         public delegate void ConsumedSequenceEventHandler(Sequence sequence);
         public event ConsumedSequenceEventHandler? ConsumedSequence;
@@ -32,6 +33,18 @@ namespace Match3Maker {
         public Vector2 CellSize = new(48, 48);
         public Vector2 Offset = new(5, 10);
 
+        public int RemainingMoves {
+            get => _remainingMoves;
+            set {
+                if (value != _remainingMoves && value.Equals(0))
+                    SpentAllMovements?.Invoke();
+
+                _remainingMoves = Math.Max(0, value);
+            }
+        }
+
+        private int _remainingMoves;
+
         public IPieceGenerator PieceGenerator;
         public ISequenceFinder SequenceFinder;
 
@@ -40,25 +53,38 @@ namespace Match3Maker {
 
 
         #region Constructors
-        public Board(int gridWidth, int gridHeight, IPieceGenerator? pieceSelector = null, ISequenceFinder? sequenceFinder = null) {
+        public Board(
+            int gridWidth,
+            int gridHeight,
+            int initialMoves,
+            IPieceGenerator? pieceSelector = null,
+            ISequenceFinder? sequenceFinder = null
+        ) {
             GridWidth = gridWidth;
             GridHeight = gridHeight;
+            RemainingMoves = initialMoves;
             PieceGenerator = pieceSelector is not null ? pieceSelector : new PieceWeightGenerator();
             SequenceFinder = sequenceFinder is not null ? sequenceFinder : new SequenceFinder();
         }
 
-        public Board(Vector2 size, IPieceGenerator? pieceSelector = null, ISequenceFinder? sequenceFinder = null) {
+        public Board(Vector2 size, int initialMoves, IPieceGenerator? pieceSelector = null, ISequenceFinder? sequenceFinder = null) {
             GridWidth = (int)size.X;
             GridHeight = (int)size.Y;
+            RemainingMoves = initialMoves;
             PieceGenerator = pieceSelector is not null ? pieceSelector : new PieceWeightGenerator();
             SequenceFinder = sequenceFinder is not null ? sequenceFinder : new SequenceFinder();
         }
 
-        public static Board Create(int gridWidth, int gridHeight, IPieceGenerator? pieceSelector = null, ISequenceFinder? sequenceFinder = null)
-            => new(gridWidth, gridHeight, pieceSelector, sequenceFinder);
+        public static Board Create(
+            int gridWidth,
+            int gridHeight,
+            int initialMoves,
+            IPieceGenerator? pieceSelector = null,
+            ISequenceFinder? sequenceFinder = null
+        ) => new(gridWidth, gridHeight, initialMoves, pieceSelector, sequenceFinder);
 
-        public static Board Create(Vector2 size, IPieceGenerator? pieceSelector = null, ISequenceFinder? sequenceFinder = null)
-            => Create((int)size.X, (int)size.Y, pieceSelector, sequenceFinder);
+        public static Board Create(Vector2 size, int initialMoves, IPieceGenerator? pieceSelector = null, ISequenceFinder? sequenceFinder = null)
+            => Create((int)size.X, (int)size.Y, initialMoves, pieceSelector, sequenceFinder);
 
         #endregion
 
@@ -103,6 +129,25 @@ namespace Match3Maker {
 
             return this;
         }
+
+        public Board ChangeRemainingMoves(int moves) {
+            RemainingMoves = moves;
+
+            return this;
+        }
+
+        public Board IncreaseMoves(int amount) {
+            RemainingMoves += amount;
+
+            return this;
+        }
+
+        public Board DecreaseMoves(int amount) {
+            RemainingMoves -= amount;
+
+            return this;
+        }
+
         #endregion
 
         #region Cells
@@ -138,6 +183,35 @@ namespace Match3Maker {
                 UpdateGridCellsNeighbours();
 
                 PreparedBoard?.Invoke();
+            }
+
+            return this;
+        }
+
+        public Board FillInitialBoard(bool allowMatchesOnStart = false, Dictionary<string, Piece>? preSelectedPieces = null) {
+            if (AvailablePieces.Count > 2 && GridCells.Count > 0) {
+
+                foreach (var column in Enumerable.Range(0, GridWidth)) {
+                    foreach (var row in Enumerable.Range(0, GridHeight)) {
+
+                        if (Cell(column, row) is GridCell currentCell && currentCell.IsEmpty()) {
+
+                            if (preSelectedPieces is not null && preSelectedPieces.TryGetValue(currentCell.Position().ToString(), out Piece piece))
+                                currentCell.AssignPiece(piece);
+                            else
+                                currentCell.AssignPiece(PieceGenerator.Roll(AvailablePieces));
+
+                        }
+                    }
+                }
+
+                if (EmptyCells().Count > 0)
+                    throw new InvalidOperationException("Board->FillInitialBoard: After calling the function, some cells are still empty, the operation is not valid");
+
+                if (!allowMatchesOnStart && (preSelectedPieces is null || preSelectedPieces.IsEmpty()))
+                    RemoveMatchesFromBoard();
+
+                FilledBoard?.Invoke();
             }
 
             return this;
@@ -268,35 +342,6 @@ namespace Match3Maker {
                 .Where(cell => cell.HasPiece())
                 .ToList()
                 .Find(cell => cell.Piece.Equals(piece));
-        }
-
-        public Board FillInitialBoard(bool allowMatchesOnStart = false, Dictionary<string, Piece>? preSelectedPieces = null) {
-            if (AvailablePieces.Count > 2 && GridCells.Count > 0) {
-
-                foreach (var column in Enumerable.Range(0, GridWidth)) {
-                    foreach (var row in Enumerable.Range(0, GridHeight)) {
-
-                        if (Cell(column, row) is GridCell currentCell && currentCell.IsEmpty()) {
-
-                            if (preSelectedPieces is not null && preSelectedPieces.TryGetValue(currentCell.Position().ToString(), out Piece piece))
-                                currentCell.AssignPiece(piece);
-                            else
-                                currentCell.AssignPiece(PieceGenerator.Roll(AvailablePieces));
-
-                        }
-                    }
-                }
-
-                if (EmptyCells().Count > 0)
-                    throw new InvalidOperationException("Board->FillInitialBoard: After calling the function, some cells are still empty, the operation is not valid");
-
-                if (!allowMatchesOnStart && (preSelectedPieces is null || preSelectedPieces.IsEmpty()))
-                    RemoveMatchesFromBoard();
-
-                FilledBoard?.Invoke();
-            }
-
-            return this;
         }
 
         public Dictionary<GridCell, GridCell> Shuffle(IEnumerable<Type>? exceptPieceTypes = null, IEnumerable<GridCell?>? exceptCells = null) {
