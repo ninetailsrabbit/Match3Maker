@@ -60,21 +60,21 @@ namespace Match3Maker {
             int gridWidth,
             int gridHeight,
             int initialMoves,
-            IPieceGenerator? pieceSelector = null,
+            IPieceGenerator? pieceGenerator = null,
             ISequenceFinder? sequenceFinder = null
         ) {
             GridWidth = gridWidth;
             GridHeight = gridHeight;
             RemainingMoves = initialMoves;
-            PieceGenerator = pieceSelector is not null ? pieceSelector : new PieceWeightGenerator();
+            PieceGenerator = pieceGenerator is not null ? pieceGenerator : new PieceWeightGenerator();
             SequenceFinder = sequenceFinder is not null ? sequenceFinder : new SequenceFinder();
         }
 
-        public Board(Vector2 size, int initialMoves, IPieceGenerator? pieceSelector = null, ISequenceFinder? sequenceFinder = null) {
+        public Board(Vector2 size, int initialMoves, IPieceGenerator? pieceGenerator = null, ISequenceFinder? sequenceFinder = null) {
             GridWidth = (int)size.X;
             GridHeight = (int)size.Y;
             RemainingMoves = initialMoves;
-            PieceGenerator = pieceSelector is not null ? pieceSelector : new PieceWeightGenerator();
+            PieceGenerator = pieceGenerator is not null ? pieceGenerator : new PieceWeightGenerator();
             SequenceFinder = sequenceFinder is not null ? sequenceFinder : new SequenceFinder();
         }
 
@@ -82,12 +82,12 @@ namespace Match3Maker {
             int gridWidth,
             int gridHeight,
             int initialMoves,
-            IPieceGenerator? pieceSelector = null,
+            IPieceGenerator? pieceGenerator = null,
             ISequenceFinder? sequenceFinder = null
-        ) => new(gridWidth, gridHeight, initialMoves, pieceSelector, sequenceFinder);
+        ) => new(gridWidth, gridHeight, initialMoves, pieceGenerator, sequenceFinder);
 
-        public static Board Create(Vector2 size, int initialMoves, IPieceGenerator? pieceSelector = null, ISequenceFinder? sequenceFinder = null)
-            => Create((int)size.X, (int)size.Y, initialMoves, pieceSelector, sequenceFinder);
+        public static Board Create(Vector2 size, int initialMoves, IPieceGenerator? pieceGenerator = null, ISequenceFinder? sequenceFinder = null)
+            => Create((int)size.X, (int)size.Y, initialMoves, pieceGenerator, sequenceFinder);
 
         #endregion
 
@@ -139,6 +139,17 @@ namespace Match3Maker {
             return this;
         }
 
+        public Board IncreaseMove() {
+            IncreaseMoves(1);
+
+            return this;
+        }
+
+        public Board DecreaseMove() {
+            DecreaseMoves(1);
+
+            return this;
+        }
         public Board IncreaseMoves(int amount) {
             RemainingMoves += amount;
 
@@ -349,11 +360,14 @@ namespace Match3Maker {
             });
         }
 
-        public GridCell? FindGridCellWithPiece(Piece piece) {
+
+        public GridCell? FindGridCellWithPiece(Piece piece) => FindGridCellWithPiece(piece.Id);
+        public GridCell? FindGridCellWithPiece(Guid id) => FindGridCellWithPiece(id.ToString());
+        public GridCell? FindGridCellWithPiece(string id) {
             return GridCells.SelectMany(cells => cells)
                 .Where(cell => cell.HasPiece())
                 .ToList()
-                .Find(cell => cell.Piece.Equals(piece));
+                .Find(cell => cell.Piece.Id.ToString().Equals(id));
         }
 
         public Dictionary<GridCell, GridCell> Shuffle(IEnumerable<Type>? exceptPieceTypes = null, IEnumerable<GridCell?>? exceptCells = null) {
@@ -415,7 +429,6 @@ namespace Match3Maker {
                 sequences = SequenceFinder.FindBoardSequences(this);
             }
         }
-
 
         #endregion
 

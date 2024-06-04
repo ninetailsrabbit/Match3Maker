@@ -26,6 +26,7 @@ This lightweight library provides the core logic and functionality you need to b
       - [Creating one piece](#creating-one-piece)
     - [Sequence](#sequence)
     - [Board](#board)
+      - [Creating a new board](#creating-a-new-board)
 
 ## Getting started
 
@@ -245,6 +246,8 @@ namespace Match3Maker {
 ```csharp
 // Only the shape
 var piece = new Piece(new NormalPieceType("circle"));
+// Or
+var piece = new Piece(new NormalPieceType("circle", Color.Green));
 
 // Static constructor
 var piece = Piece.create(new NormalPieceType("square", Color.Red));
@@ -269,7 +272,7 @@ piece.Clone();
 
 ### Sequence
 
-A sequence by definition does not need to follow any rules, the cells from this sequence are considered a match. This provides flexibility to for example remove an entire row in the boardwithout the pieces having to match each other or live in the same row & column.
+A sequence by definition does not need to follow any rules, the cells from this sequence are considered a match. This provides flexibility to for example remove an entire row in the board without the pieces having to match each other or live in the same row & column.
 
 **The constructor validate the cells passed as parameter and only assign the ones that has a piece.**
 
@@ -322,3 +325,117 @@ sequence.Clone();
 ```
 
 ### Board
+
+This is the main class that you will actually use, you can manipulate any aspect of the dashboard and extract the necessary information for the UI.
+
+#### Creating a new board
+
+```csharp
+
+// PieceWeightGenerator from library is provided when null
+// SequenceFinder from library is provided when null
+public Board(
+    int gridWidth,
+    int gridHeight,
+    int initialMoves,
+    IPieceGenerator? pieceGenerator = null,
+    ISequenceFinder? sequenceFinder = null)
+
+
+// Grid size can be passed as integer or Vector2.
+var board = new Board(5, 7, 25);
+var board = new Board(new Vector2(7, 5), 25);
+// Or
+var board = Board.Create(5, 7, 25);
+
+
+// Add available pieces to roll, they need to be defined to fill the board correctly
+ Piece square = new(new NormalPieceType("square"));
+ Piece circle = new(new NormalPieceType("circle"));
+ Piece triangle = new(new NormalPieceType("triangle"));
+
+ List<Piece> pieces = [square, circle, triangle];
+
+// Further methods are provided to add or remove pieces on the board any time
+board.AddAvailablePieces(pieces);
+board.AddAvailablePiece(pieces.First());
+board.RemoveAvailablePieces(pieces);
+board.RemoveAvailablePiece(pieces.Last());
+
+
+board.AddAvailablePieces(pieces)
+     .PrepareGridCells() // Initialize the GridCell classes with the width & height provided, overwrite parameter needs to be true if called a second time
+     .FillInitialBoard(false); // public Board FillInitialBoard(bool allowMatchesOnStart = false, Dictionary<string, Piece>? preSelectedPieces = null)
+
+
+
+// You can change properties any time
+board.ChangeGridWidth(7)
+     .ChangeGridHeight(8)
+     .ChangeGridSize(new Vector2(8, 7)) //Shorcut alternative
+     .ChangeFillMode(Board.FILL_MODES.SIDE_DOWN)
+     .ChangeCellSize(new Vector2(32, 32)) // Size information from the cell to display on your UI
+     .ChangeOffset(new Vector2(5, 10)) // Offset separation between cells to display on your UI
+     .ChangeRemainingMoves(20);
+
+// Increase or decrease board remaining moves which represents the remaining moves the player has left to use on this board.
+// EVENT: When remaining moves reachs zero raises the event "SpentAllMoves" and lock the board.
+board.IncreaseMove();
+board.DecreaseMove();
+
+//Plural
+board.IncreaseMoves(2);
+board.DecreaseMoves(3);
+
+// Lock or unlock this board, has no immediate effect on the board, it is information to be used externally.
+board.Lock();
+board.Unlock();
+
+//Access current cells with
+board.GridCells;
+
+// Cell from column 0 and row 1, null is returned if it does not exists.
+board.Cell(0, 1)
+board.Cell(new Vector2(1, 0))
+
+//Returns the calculated cell position with the offset for a grid cell
+board.CellPosition(board.Cell(2, 5)); // Vector2(250, 50) random vector for example purposes
+
+// Get the cells of selected column & row
+board.CellsFromColumn(1);
+board.CellsFromRow(3);
+
+// Get empty cells from board
+board.EmptyCells();
+board.EmptyCellsFromRow(3);
+board.EmptyCellsFromColumn(2);
+
+// Get cells that contains a piece of selected type
+board.CellsFromRowOfPieceType(2, typeof(SpecialPieceType));
+board.CellsFromColumnOfPieceType(1, typeof(NormalPieceType));
+board.CellsOfPieceType(typeof(NormalPieceType));
+
+// Returns the 2 upper cells from the origin one provided, only returns the valid cells,
+// it will never go out of bounds even if you use large numbers or out of range of that cell.
+board.UpperCellsFrom(board.Cell(3, 3), 2); // GridCell(3, 2), GridCell(3, 1)
+board.BottomCellsFrom(board.Cell(3, 3), 2); // GridCell(3, 4), GridCell(3, 5)
+board.RightCellsFrom(board.Cell(3, 3), 2); // GridCell(4, 3), GridCell(5, 3)
+board.LeftCellsFrom(board.Cell(3, 3), 2); // GridCell(1, 3), GridCell(2, 3)
+
+// Same syntax to retrieve the pieces instead of the cells
+board.UpperCellsPiecesFrom(board.Cell(3, 3), 2);
+board.BottomCellsPiecesFrom(board.Cell(2, 1), 1);
+board.RightCellsPiecesFrom(board.Cell(4, 1), 5);
+board.LeftCellsPiecesFrom(board.Cell(7, 2), 3);
+
+
+// Find a grid cell that contains the piece provided, it uses the Id property internally for the search.
+var piece = new Piece(new NormalPieceType("circle"));
+board.FindGridCellWithPiece(piece);
+//Or
+board.FindGridCellWithPiece(piece.Id);
+board.FindGridCellWithPiece(piece.Id.ToString());
+
+
+
+```
