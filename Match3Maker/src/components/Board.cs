@@ -36,8 +36,10 @@ namespace Match3Maker {
         public int RemainingMoves {
             get => _remainingMoves;
             set {
-                if (value != _remainingMoves && value.Equals(0))
+                if (value != _remainingMoves && value.Equals(0)) {
+                    Locked = true;
                     SpentAllMovements?.Invoke();
+                }
 
                 _remainingMoves = Math.Max(0, value);
             }
@@ -51,6 +53,7 @@ namespace Match3Maker {
         public List<List<GridCell>> GridCells = [];
         public List<Piece> AvailablePieces = [];
 
+        public bool Locked = false;
 
         #region Constructors
         public Board(
@@ -147,6 +150,15 @@ namespace Match3Maker {
 
             return this;
         }
+
+        public void Lock() {
+            Locked = true;
+        }
+
+        public void Unlock() {
+            Locked = false;
+        }
+
 
         #endregion
 

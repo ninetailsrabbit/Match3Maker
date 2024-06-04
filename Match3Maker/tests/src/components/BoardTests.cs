@@ -45,6 +45,8 @@ namespace Match3Tests {
 
             board.SpentAllMovements += listener;
 
+            Assert.False(board.Locked);
+
             Assert.Equal(10, board.RemainingMoves);
             board.ChangeRemainingMoves(7);
 
@@ -66,6 +68,8 @@ namespace Match3Tests {
 
             // Cannot go below zero and events should be raised once only when previous value was not zero
             Assert.Equal(0, board.RemainingMoves);
+
+            Assert.True(board.Locked);
 
             Assert.Single(receivedEvents);
             Assert.Equal("SpentMoves", receivedEvents.First());
