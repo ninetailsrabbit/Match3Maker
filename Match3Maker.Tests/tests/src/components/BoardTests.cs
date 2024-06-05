@@ -73,6 +73,9 @@ namespace Match3MakerTests {
 
             Assert.Single(receivedEvents);
             Assert.Equal("SpentMoves", receivedEvents.First());
+
+            board.SpentAllMovements -= listener;
+
         }
 
         [Fact]
@@ -689,6 +692,32 @@ namespace Match3MakerTests {
                 Assert.DoesNotContain(cell, result.Keys);
                 Assert.DoesNotContain(cell, result.Values);
             });
+        }
+
+        [Fact]
+        public void Should_Raise_Consumed_Sequence_Event_When_Consumed() {
+            var board = Board.Create(5, 5, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+
+            List<Sequence> receivedEvents = [];
+
+            void listener(Sequence sequence) {
+                receivedEvents.Add(sequence);
+            }
+
+            board.ConsumedSequence += listener;
+
+            var sequence = new Sequence(new List<GridCell>() {
+                new(1, 1, new Piece(_pieceFactory.CreateNormalPiece("circle"))),
+                new(1, 2, new Piece(_pieceFactory.CreateNormalPiece("circle"))),
+                new(1, 3, new Piece(_pieceFactory.CreateNormalPiece("circle"))),
+            }, Sequence.SHAPES.VERTICAL);
+
+            board.ConsumeSequence(sequence);
+
+            Assert.Single(receivedEvents);
+            Assert.True(receivedEvents[0].Pieces().All(piece => piece.Type.GetType().Equals(typeof(NormalPieceType)) && piece.Type.Shape.Equals("circle")));
+
+            board.ConsumedSequence -= listener;
 
         }
 

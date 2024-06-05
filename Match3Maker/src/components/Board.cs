@@ -459,5 +459,12 @@ namespace Match3Maker {
         }
 
         #endregion
+
+        #region Sequences
+        public void ConsumeSequence(Sequence sequence) {
+            ConsumedSequence?.Invoke(sequence.Clone() as Sequence);
+            sequence.Consume();
+        }
+        #endregion
     }
 }
