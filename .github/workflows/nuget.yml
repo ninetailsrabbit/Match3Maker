@@ -38,7 +38,15 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Test with dotnet
-      run: dotnet test ${{ vars.CSPROJ_TESTS_PATH }} --logger trx --results-directory "TestResults-8.0"
+      run: dotnet test ${{ vars.CSPROJ_TESTS_PATH }} --logger "trx;LogFileName=test-results.trx" || true
+    - name: Test Report
+      uses: dorny/test-reporter@v1.9.1
+      if: always()
+      with:
+        name: Dotnet Tests result
+        path: "**/test-results.trx"                            
+        reporter: dotnet-trx
+        fail-on-error: true
     - name: Build and Pack NuGet package with versioning
       run: dotnet pack ${{ vars.CSPROJ_PATH }} -p:GeneratePackageOnBuild=false -p:Version='${{ steps.gitversion.outputs.SemVer }}' -c Release
 
