@@ -42,7 +42,7 @@ jobs:
       uses: actions/upload-artifact@v4.3.3
       with:
         name: nugetPackage
-        path: bin/release/*.nupkg
+        path: bin/Release/*.nupkg
 
   release:
     runs-on: ubuntu-latest    
@@ -61,6 +61,9 @@ jobs:
     - name: Push package to GitHub packages 
       if: needs.build.outputs.CommitsSinceVersionSource > 0 #Only release if there has been a commit/version change  
       run: dotnet nuget push nugetPackage/*.nupkg --api-key ${{ secrets.NUGET_PACKAGE_TOKEN }} --source "github"
+        # Publish to NuGet.org
+    - name: Publish to NuGet.org
+      run: dotnet nuget push nugetPackage/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
     
     #Create release
     - name: Create Release
