@@ -38,4 +38,12 @@
 		<None Include="icon.png" Pack="True" PackagePath="" />
 	</ItemGroup>
 
+	<Target Name="CopyToSolutionFolder" AfterTargets="GenerateNuspec">
+        <ItemGroup>
+            <File Include="$(ProjectDir)bin\release\*.nupkg"></File>
+            
+        </ItemGroup>
+        <Copy SourceFiles="@(File)" DestinationFolder="$(SolutionDir)"></Copy>
+    </Target>
+	
 </Project>
