@@ -53,17 +53,15 @@ jobs:
     #Push NuGet package to GitHub packages
     - name: Download nuget package artifact
       uses: actions/download-artifact@v4.1.7
-      with:
-        name: nugetPackage
-        path: Match3Maker/bin/Release/*.nupkg
+
     - name: Prep packages
       run: dotnet nuget add source --username ${{ vars.USERNAME }} --password ${{ secrets.NUGET_PACKAGE_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ vars.USERNAME }}/index.json"
     - name: Push package to GitHub packages 
       if: needs.build.outputs.CommitsSinceVersionSource > 0 #Only release if there has been a commit/version change  
-      run: dotnet nuget push nugetPackage/*.nupkg --api-key ${{ secrets.NUGET_PACKAGE_TOKEN }} --source "github"
+      run: dotnet nuget push Match3Maker/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_PACKAGE_TOKEN }} --source "github"
         # Publish to NuGet.org
     - name: Publish to NuGet.org
-      run: dotnet nuget push nugetPackage/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      run: dotnet nuget push Match3Maker/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
     
     #Create release
     - name: Create Release
@@ -72,5 +70,5 @@ jobs:
       with:
         tag: ${{ needs.build.outputs.Version }}
         name: Release ${{ needs.build.outputs.Version }}
-        artifacts: "nugetPackage/*"
+        artifacts: "Match3Maker/bin/Release/*.nupkg"
         token: ${{ secrets.NUGET_PACKAGE_TOKEN }}
