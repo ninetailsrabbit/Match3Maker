@@ -36,13 +36,13 @@ jobs:
         dotnet-version: 8.0.x
  
     - name: Build and Pack NuGet package with versioning
-      run: dotnet pack ${{ vars.CSPROJ_PATH }} -p:GeneratePackageOnBuild=false -p:Version='${{ steps.gitversion.outputs.SemVer }}' -c Release
+      run: dotnet pack ${{ vars.CSPROJ_PATH }} -p:GeneratePackageOnBuild=false -c Release
 
     - name: Upload NuGet package to GitHub
       uses: actions/upload-artifact@v4.3.3
       with:
         name: nugetPackage
-        path: ./bin/Release/*.nupkg
+        path: bin/Release/*.nupkg
 
   release:
     runs-on: ubuntu-latest    
@@ -55,7 +55,7 @@ jobs:
       uses: actions/download-artifact@v4.1.7
       with:
         name: nugetPackage
-        path: nugetPackage
+        path: bin/Release/*.nupkg
     - name: Prep packages
       run: dotnet nuget add source --username ${{ vars.USERNAME }} --password ${{ secrets.NUGET_PACKAGE_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ vars.USERNAME }}/index.json"
     - name: Push package to GitHub packages 
