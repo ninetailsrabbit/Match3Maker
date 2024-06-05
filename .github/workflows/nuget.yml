@@ -36,13 +36,13 @@ jobs:
         dotnet-version: 8.0.x
  
     - name: Build and Pack NuGet package with versioning
-      run: dotnet pack ${{ vars.CSPROJ_PATH }} -p:GeneratePackageOnBuild=false -c Release
+      run: dotnet pack ${{ vars.CSPROJ_PATH }} -p:GeneratePackageOnBuild=false -p:Version='${{ steps.gitversion.outputs.SemVer }}' -c Release
 
     - name: Upload NuGet package to GitHub
       uses: actions/upload-artifact@v4.3.3
       with:
         name: nugetPackage
-        path: bin/Release/*.nupkg
+        path: Match3Maker/bin/Release/*.nupkg
 
   release:
     runs-on: ubuntu-latest    
@@ -55,7 +55,7 @@ jobs:
       uses: actions/download-artifact@v4.1.7
       with:
         name: nugetPackage
-        path: bin/Release/*.nupkg
+        path: Match3Maker/bin/Release/*.nupkg
     - name: Prep packages
       run: dotnet nuget add source --username ${{ vars.USERNAME }} --password ${{ secrets.NUGET_PACKAGE_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ vars.USERNAME }}/index.json"
     - name: Push package to GitHub packages 
@@ -63,7 +63,7 @@ jobs:
       run: dotnet nuget push nugetPackage/*.nupkg --api-key ${{ secrets.NUGET_PACKAGE_TOKEN }} --source "github"
         # Publish to NuGet.org
     - name: Publish to NuGet.org
-      run: dotnet nuget push nugetPackage/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push nugetPackage/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
     
     #Create release
     - name: Create Release
