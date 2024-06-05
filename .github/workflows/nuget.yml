@@ -34,7 +34,11 @@ jobs:
       uses: actions/setup-dotnet@v4.0.0
       with:
         dotnet-version: 8.0.x
- 
+
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Test with dotnet
+      run: dotnet test ${{ vars.CSPROJ_TESTS_PATH }} --logger trx --results-directory "TestResults-8.0"
     - name: Build and Pack NuGet package with versioning
       run: dotnet pack ${{ vars.CSPROJ_PATH }} -p:GeneratePackageOnBuild=false -p:Version='${{ steps.gitversion.outputs.SemVer }}' -c Release
 
@@ -72,5 +76,5 @@ jobs:
       with:
         tag: ${{ needs.build.outputs.Version }}
         name: Release ${{ needs.build.outputs.Version }}
-        artifacts: "/*"
+        artifacts: "*"
         token: ${{ secrets.NUGET_PACKAGE_TOKEN }}
