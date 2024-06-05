@@ -350,6 +350,9 @@ var board = new Board(new Vector2(7, 5), 25);
 // Or
 var board = Board.Create(5, 7, 25);
 
+// You can provide your custom implementations of IPieceGenerator or ISequenceFinder
+var board = Board.Create(4, 4, 20, new YourCustomPieceGenerator(), new YourSequenceFinder());
+
 
 // Add available pieces to roll, they need to be defined to fill the board correctly
  Piece square = new(new NormalPieceType("square"));
