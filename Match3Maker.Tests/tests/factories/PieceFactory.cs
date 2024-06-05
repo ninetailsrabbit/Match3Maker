@@ -10,6 +10,10 @@ namespace Match3MakerTests {
         public IPieceType CreateSpecialPiece(string shape, Color? color = null) {
             return new SpecialPieceType(shape, color);
         }
+
+        public IPieceType CreateObstaclePiece(string shape, Color? color = null) {
+            return new ObstaclePieceType(shape, color);
+        }
     }
 
 }

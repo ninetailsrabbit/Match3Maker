@@ -27,6 +27,8 @@ This lightweight library provides the core logic and functionality you need to b
     - [Sequence](#sequence)
     - [Board](#board)
       - [Creating a new board](#creating-a-new-board)
+  - [ISequenceFinder](#isequencefinder)
+  - [IPieceGenerator](#ipiecegenerator)
 
 ## Getting started
 
@@ -444,9 +446,105 @@ board.FindGridCellWithPiece(piece.Id.ToString());
 // Pieces with a IPieceType where CanBeShuffled() returns false are not affected in this process.
 var result = board.Shuffle();
 
-
 // Remove current matches from board, used internally when FilledInitialBoard() is called
 // This remove the current sequences and create new pieces so the board does not have any current sequences active.
 board.RemoveMatchesFromBoard();
 
+```
+
+## ISequenceFinder
+
+The behaviour to find the match shapes can be implemented using this interface. By default this library provides you a default `SequenceFinder`.
+
+```csharp
+
+public interface ISequenceFinder {
+
+    #region Properties
+    bool HorizontalShape { get; set; }
+    bool VerticalShape { get; set; }
+    bool TShape { get; set; }
+    bool LShape { get; set; }
+    int MinMatch { get; set; }
+    int MaxMatch { get; set; }
+    int MinSpecialMatch { get; set; }
+    int MaxSpecialMatch { get; set; }
+    #endregion
+
+    #region Find functions
+    public List<Sequence> FindHorizontalSequences(IEnumerable<GridCell> cells);
+    public List<Sequence> FindVerticalSequences(IEnumerable<GridCell> cells);
+    public Sequence? FindTShapeSequence(Sequence sequenceA, Sequence sequenceB);
+    public Sequence? FindLShapeSequence(Sequence sequenceA, Sequence sequenceB);
+    public List<Sequence> FindBoardSequences(Board board);
+    public List<Sequence> FindHorizontalBoardSequences(Board board);
+    public List<Sequence> FindVerticalBoardSequences(Board board);
+    public Sequence? FindMatchFromCell(Board board, GridCell cell);
+    #endregion
+
+    #region Options
+    public ISequenceFinder ChangeMinMatchTo(int value) {
+        MinMatch = value;
+
+        return this;
+    }
+    public ISequenceFinder ChangeMaxMatchTo(int value) {
+        MaxMatch = value;
+
+        return this;
+    }
+    public ISequenceFinder EnableHorizontalShape() {
+        HorizontalShape = true;
+        return this;
+    }
+
+    public ISequenceFinder DisableHorizontalShape() {
+        HorizontalShape = false;
+        return this;
+    }
+
+    public ISequenceFinder EnableVerticalShape() {
+        VerticalShape = true;
+        return this;
+    }
+
+    public ISequenceFinder DisableVerticalShape() {
+        VerticalShape = false;
+        return this;
+    }
+
+    public ISequenceFinder EnableLShape() {
+        LShape = true;
+        return this;
+    }
+
+    public ISequenceFinder DisableLShape() {
+        LShape = false;
+        return this;
+    }
+
+    public ISequenceFinder EnableTShape() {
+        TShape = true;
+        return this;
+    }
+
+    public ISequenceFinder DisableTShape() {
+        TShape = false;
+        return this;
+    }
+    #endregion
+}
+```
+
+## IPieceGenerator
+
+The behaviour to generate new pieces after consuming them it's implemented with this interface. By default this library provides you a `PieceWeightGenerator` that uses the `Weight and TotalAccumWeight` property from the pieces.
+
+The higher the weight, the more changes to appear in the next roll.
+
+```csharp
+    public interface IPieceGenerator {
+
+      public Piece Roll(List<Piece> pieces, IEnumerable<Type>? only = null);
+    }
 ```

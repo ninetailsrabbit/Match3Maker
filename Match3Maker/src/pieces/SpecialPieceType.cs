@@ -16,7 +16,8 @@ namespace Match3Maker {
 
         public bool MatchWith(Piece piece) {
 
-            return typeof(SpecialPieceType).IsAssignableFrom(piece.Type.GetType())
+            return piece.Type is not ObstaclePieceType
+                && typeof(SpecialPieceType).IsAssignableFrom(piece.Type.GetType())
                 && Shape.Trim().Equals(piece.Type.Shape, StringComparison.OrdinalIgnoreCase)
                 && Color.Equals(piece.Type.Color);
         }

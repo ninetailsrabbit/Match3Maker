@@ -34,7 +34,6 @@
 
             return this;
         }
-
         public ISequenceFinder EnableHorizontalShape() {
             HorizontalShape = true;
             return this;
@@ -75,7 +74,5 @@
             return this;
         }
         #endregion
-
     }
-
 }

@@ -1,45 +1,44 @@
-﻿//using Match3Maker;
-//using Xunit;
+﻿using Match3Maker;
+using Xunit;
 
-//namespace Match3Tests {
-//    public class PieceWeightGeneratorTests {
+namespace Match3MakerTests {
+    public class PieceWeightGeneratorTests {
 
-//        private readonly PieceWeightGenerator _pieceWeightGenerator = new();
+        private readonly PieceWeightGenerator _pieceWeightGenerator = new();
+        private readonly PieceFactory _pieceFactory = new();
 
-//        [Fact]
-//        public void Should_Throw_Argument_Exception_When_Pieces_Are_Empty() {
-           
-//            var exception = Assert.Throws<ArgumentException>(() => _pieceWeightGenerator.Roll([]));
+        [Fact]
+        public void Should_Throw_Argument_Exception_When_Pieces_Are_Empty() {
 
-//            Assert.Equal("PieceWeightGenerator: The pieces to roll cannot be empty", exception.Message);
-//        }
+            var exception = Assert.Throws<ArgumentException>(() => _pieceWeightGenerator.Roll([]));
 
-//        [Fact]
-//        public void Should_Roll_Always_At_Least_One_Piece_Of_Type_Provided() {
-//            List<Piece> pieces = [
-//                new Piece("triangle", Piece.TYPES.NORMAL, 2f),
-//                new Piece("square", Piece.TYPES.NORMAL, 1.5f),
-//                new Piece("circle", Piece.TYPES.NORMAL, 1f),
-//                new Piece("fence", Piece.TYPES.OBSTACLE, 1.3f),
-//                new Piece("ice-block", Piece.TYPES.OBSTACLE, 1.6f),
-//                new Piece("special-circle", Piece.TYPES.SPECIAL, .9f),
-//            ];
+            Assert.Equal("PieceWeightGenerator: The pieces to roll cannot be empty", exception.Message);
+        }
 
-//            Piece piece = _pieceWeightGenerator.Roll(pieces, [Piece.TYPES.NORMAL]);
+        [Fact]
+        public void Should_Roll_Always_At_Least_One_Piece_Of_Type_Provided() {
+            List<Piece> pieces = [
+                new Piece(_pieceFactory.CreateNormalPiece("triangle"), 2f),
+                        new Piece(_pieceFactory.CreateNormalPiece("square"), 1.5f),
+                        new Piece(_pieceFactory.CreateNormalPiece("circle"), 1f),
+                        new Piece(_pieceFactory.CreateObstaclePiece("block"), 1.3f),
+                        new Piece(_pieceFactory.CreateObstaclePiece("ice-block"), 1.6f),
+                        new Piece(_pieceFactory.CreateSpecialPiece("special"), .9f),
+                    ];
 
-//            Assert.NotNull(piece);
-//            Assert.True(piece.Type.Equals(Piece.TYPES.NORMAL));
+            Piece piece = _pieceWeightGenerator.Roll(pieces, [typeof(NormalPieceType)]);
 
-//            piece = _pieceWeightGenerator.Roll(pieces, [Piece.TYPES.OBSTACLE]);
+            Assert.NotNull(piece);
+            Assert.True(piece.Type.GetType().Equals(typeof(NormalPieceType)));
 
-//            Assert.NotNull(piece);
-//            Assert.True(piece.Type.Equals(Piece.TYPES.OBSTACLE));
+            piece = _pieceWeightGenerator.Roll(pieces, [typeof(ObstaclePieceType)]);
+            Assert.NotNull(piece);
+            Assert.True(piece.Type.GetType().Equals(typeof(ObstaclePieceType)));
 
-//            piece = _pieceWeightGenerator.Roll(pieces, [Piece.TYPES.SPECIAL]);
+            piece = _pieceWeightGenerator.Roll(pieces, [typeof(SpecialPieceType)]);
+            Assert.NotNull(piece);
+            Assert.True(piece.Type.GetType().Equals(typeof(SpecialPieceType)));
+        }
+    }
 
-//            Assert.NotNull(piece);
-//            Assert.True(piece.Type.Equals(Piece.TYPES.SPECIAL));
-//        }
-//    }
-
-//}
+}
