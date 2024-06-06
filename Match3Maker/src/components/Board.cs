@@ -211,6 +211,17 @@ namespace Match3Maker {
             return this;
         }
 
+        public Board CellsThatCanContainPieces(IEnumerable<GridCell> cells) {
+            cells.RemoveNullables().ToList().ForEach(cell => cell.CanContainPiece = true);
+
+            return this;
+        }
+        public Board CellsThatCannotContainPieces(IEnumerable<GridCell> cells) {
+            cells.RemoveNullables().ToList().ForEach(cell => cell.CanContainPiece = false);
+
+            return this;
+        }
+
         public Board FillInitialBoard(bool allowMatchesOnStart = false, Dictionary<string, Piece>? preSelectedPieces = null) {
             if (AvailablePieces.Count > 2 && GridCells.Count > 0) {
 
@@ -305,6 +316,12 @@ namespace Match3Maker {
         public List<GridCell> EmptyCells() => GridCells.SelectMany(cells => cells).Where(cell => cell.IsEmpty()).ToList();
         public List<GridCell> EmptyCellsFromRow(int row) => CellsFromRow(row).Where(cell => cell.IsEmpty()).ToList();
         public List<GridCell> EmptyCellsFromColumn(int column) => CellsFromColumn(column).Where(cell => cell.IsEmpty()).ToList();
+        public List<GridCell> CellsThatCanContainPieces() => GridCells.SelectMany(cells => cells).Where(cell => cell.CanContainPiece).ToList();
+        public List<GridCell> CellsThatCannotContainPieces() => GridCells.SelectMany(cells => cells).Where(cell => !cell.CanContainPiece).ToList();
+        public List<GridCell> CellsThatCanContainPiecesFromRow(int row) => CellsFromRow(row).Where(cell => cell.CanContainPiece).ToList();
+        public List<GridCell> CellsThatCannotContainPiecesFromRow(int row) => CellsFromRow(row).Where(cell => !cell.CanContainPiece).ToList();
+        public List<GridCell> CellsThatCanContainPiecesFromColumn(int column) => CellsFromColumn(column).Where(cell => cell.CanContainPiece).ToList();
+        public List<GridCell> CellsThatCannotContainPiecesFromColumn(int column) => CellsFromColumn(column).Where(cell => !cell.CanContainPiece).ToList();
 
         public List<GridCell> CellsFromColumn(int column) {
             List<GridCell> result = [];

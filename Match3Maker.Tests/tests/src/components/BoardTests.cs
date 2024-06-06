@@ -148,6 +148,30 @@ namespace Match3MakerTests {
         }
 
         [Fact]
+        public void Should_Choose_Grid_Cells_That_Can_Or_Not_Pieces() {
+            var board = new Board(8, 7, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+
+            board.PrepareGridCells();
+
+
+            Assert.True(board.Cell(1, 0).CanContainPiece);
+            Assert.True(board.Cell(4, 2).CanContainPiece);
+            Assert.True(board.Cell(2, 2).CanContainPiece);
+
+            board.CellsThatCanContainPieces([board.Cell(1, 0), board.Cell(4, 2), board.Cell(2, 2)]);
+
+            Assert.True(board.Cell(1, 0).CanContainPiece);
+            Assert.True(board.Cell(4, 2).CanContainPiece);
+            Assert.True(board.Cell(2, 2).CanContainPiece);
+
+            board.CellsThatCannotContainPieces([board.Cell(1, 0), board.Cell(4, 2), board.Cell(2, 2)]);
+
+            Assert.False(board.Cell(1, 0).CanContainPiece);
+            Assert.False(board.Cell(4, 2).CanContainPiece);
+            Assert.False(board.Cell(2, 2).CanContainPiece);
+        }
+
+        [Fact]
         public void Should_Assign_Neighbours_On_Prepared_Grid_Cells() {
             var board = new Board(8, 7, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
 
@@ -404,6 +428,29 @@ namespace Match3MakerTests {
             Assert.Empty(board.CellsFromRow(-1));
             Assert.Empty(board.CellsFromRow(9));
 
+        }
+
+        [Fact]
+        public void Should_Return_Cells_That_Cannot_Contain_Pieces() {
+            var board = new Board(8, 7, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            board.PrepareGridCells();
+
+            List<GridCell> cells = [board.Cell(1, 0), board.Cell(4, 2), board.Cell(2, 2), board.Cell(1, 3)];
+
+            board.CellsThatCannotContainPieces(cells);
+
+            Assert.True(board.CellsThatCannotContainPieces().All(cell => cells.Contains(cell)));
+
+
+            var cellsFromColumn = board.CellsThatCannotContainPiecesFromColumn(1);
+
+            Assert.True(cellsFromColumn.All(cell => cells.Contains(cell)));
+            Assert.Equal(2, cellsFromColumn.Count);
+
+            var cellsFromRow = board.CellsThatCannotContainPiecesFromRow(2);
+
+            Assert.True(cellsFromRow.All(cell => cells.Contains(cell)));
+            Assert.Equal(2, cellsFromRow.Count);
         }
 
         [Fact]
