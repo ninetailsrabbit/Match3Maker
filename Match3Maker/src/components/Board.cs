@@ -188,7 +188,7 @@ namespace Match3Maker {
         }
 
         public Vector2 CellPosition(GridCell cell)
-            => new(CellSize.X * cell.Column + (Offset.X * cell.Column), CellSize.Y * cell.Row + (Offset.Y * cell.Row));
+            => new(CellSize.X * cell.Column + Offset.X, CellSize.Y * cell.Row + Offset.Y);
 
         public Board PrepareGridCells(bool overwrite = false) {
 
