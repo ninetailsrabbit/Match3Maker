@@ -18,14 +18,12 @@
         /// 
         /// https://stackoverflow.com/questions/63650648/random-float-in-c-sharp
         /// </remarks>
-        public static float NextFloat(this Random random, float minValue = 0.000001f, float maxValue = 1f) {
-            float range = Math.Min(1, Math.Max(minValue, maxValue) - Math.Min(minValue, maxValue));
+        public static float NextFloat(this Random random, float minValue = float.MinValue, float maxValue = float.MaxValue) {
+            double range = (double)maxValue - (double)minValue;
+            double sample = random.NextDouble();
+            double scaled = (sample * range) + float.MinValue;
 
-            double mantissa = (random.NextDouble() * 2.0) - 1.0;
-            // choose -149 instead of -126 to also generate subnormal floats (*)
-            double exponent = Math.Pow(2.0, random.Next(-126, 128));
-
-            return (float)(mantissa * exponent) * range;
+            return (float)scaled;
         }
 
     }
