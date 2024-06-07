@@ -243,8 +243,9 @@ namespace Match3Maker {
                     }
                 }
 
-                if (EmptyCells().Count > 0)
+                if (EmptyCells().Where(cell => cell.CanContainPiece).Any())
                     throw new InvalidOperationException("Board->FillInitialBoard: After calling the function, some cells are still empty, the operation is not valid");
+
 
                 if (!allowMatchesOnStart && (preSelectedPieces is null || preSelectedPieces.IsEmpty()))
                     RemoveMatchesFromBoard();
