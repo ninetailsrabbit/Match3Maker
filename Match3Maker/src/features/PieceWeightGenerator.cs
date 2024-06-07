@@ -19,6 +19,7 @@ namespace Match3Maker {
 
             do {
                 selectedPieces.ToList().Shuffle();
+                totalWeight = 0f;
 
                 foreach (Piece piece in selectedPieces) {
                     piece.ResetAccumWeight();
@@ -29,6 +30,7 @@ namespace Match3Maker {
 
                 float roll = _rng.NextFloat(0f, totalWeight);
 
+                
                 foreach (Piece piece in selectedPieces) {
 
                     if (roll <= piece.TotalAccumWeight) {

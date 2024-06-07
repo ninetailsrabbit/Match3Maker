@@ -21,7 +21,7 @@
         public static float NextFloat(this Random random, float minValue = float.MinValue, float maxValue = float.MaxValue) {
             double range = (double)maxValue - (double)minValue;
             double sample = random.NextDouble();
-            double scaled = (sample * range) + float.MinValue;
+            double scaled = (sample * range) + minValue;
 
             return (float)scaled;
         }
