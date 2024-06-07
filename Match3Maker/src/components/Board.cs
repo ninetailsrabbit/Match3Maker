@@ -190,10 +190,11 @@ namespace Match3Maker {
         public Vector2 CellPosition(GridCell cell)
             => new(CellSize.X * cell.Column + Offset.X, CellSize.Y * cell.Row + Offset.Y);
 
-        public Board PrepareGridCells(bool overwrite = false) {
-
+        public Board PrepareGridCells(List<Vector2>? disabledCells = null, bool overwrite = false) {
             if (GridCells.IsEmpty() || overwrite) {
+
                 GridCells.Clear();
+                disabledCells ??= CellsThatCannotContainPieces().Select(cell => cell.Position()).ToList();
 
                 foreach (var column in Enumerable.Range(0, GridWidth)) {
                     GridCells.Add([]);
@@ -205,18 +206,21 @@ namespace Match3Maker {
 
                 UpdateGridCellsNeighbours();
 
+                if (disabledCells.Count > 0)
+                    CellsThatCannotContainPieces(disabledCells.Select(Cell));
+
                 PreparedBoard?.Invoke();
             }
 
             return this;
         }
 
-        public Board CellsThatCanContainPieces(IEnumerable<GridCell> cells) {
+        public Board CellsThatCanContainPieces(IEnumerable<GridCell?> cells) {
             cells.RemoveNullables().ToList().ForEach(cell => cell.CanContainPiece = true);
 
             return this;
         }
-        public Board CellsThatCannotContainPieces(IEnumerable<GridCell> cells) {
+        public Board CellsThatCannotContainPieces(IEnumerable<GridCell?> cells) {
             cells.RemoveNullables().ToList().ForEach(cell => cell.CanContainPiece = false);
 
             return this;

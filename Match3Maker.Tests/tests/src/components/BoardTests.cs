@@ -141,10 +141,21 @@ namespace Match3MakerTests {
             Assert.Equal(board.GridWidth, board.GridCells.Count);
             Assert.Equal(board.Dimensions(), board.GridCells.SelectMany(cells => cells).Count());
 
-            board.ChangeGridSize(new Vector2(10, 10)).PrepareGridCells(true);
+            board.ChangeGridSize(new Vector2(10, 10)).PrepareGridCells(null, true);
 
             Assert.Equal(board.GridWidth, board.GridCells.Count);
             Assert.Equal(board.Dimensions(), board.GridCells.SelectMany(cells => cells).Count());
+        }
+
+        [Fact]
+        public void Should_Be_Able_To_Choose_Disabled_Cells_On_Prepare() {
+            var board = new Board(8, 7, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+
+            Assert.Empty(board.GridCells);
+
+            board.PrepareGridCells([new Vector2(1, 1), new Vector2(3, 3), new Vector2(4, 2)]);
+
+            Assert.True(new List<GridCell>() { board.Cell(1, 1), board.Cell(3, 3), board.Cell(2, 4) }.All(cell => !cell.CanContainPiece));
         }
 
         [Fact]
