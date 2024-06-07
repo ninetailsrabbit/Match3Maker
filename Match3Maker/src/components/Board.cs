@@ -435,9 +435,15 @@ namespace Match3Maker {
 
             while (sequences.Count > 0) {
                 foreach (Sequence sequence in sequences) {
+                    var cellsToChange = sequence.Cells.Take((sequence.Cells.Count / 3) + 1);
+                    var pieceTypesToChange = cellsToChange.Select(cell => cell.Piece.Type);
 
-                    foreach (GridCell currentCell in sequence.Cells) {
-                        var availablePieces = AvailablePieces.Where(piece => !piece.Type.Shape.Equals(currentCell.Piece.Type.Shape)).ToList();
+                    var availablePieces = AvailablePieces.Where(piece => {
+                        return !pieceTypesToChange.Contains(piece.Type)
+                        && !pieceTypesToChange.Select(pieceType => pieceType.Shape).Contains(piece.Type.Shape);
+                    }).ToList();
+
+                    foreach (GridCell currentCell in cellsToChange) {
                         var newPiece = PieceGenerator.Roll(availablePieces, [currentCell.Piece.Type.GetType()]);
 
                         if (newPiece is not null) {
