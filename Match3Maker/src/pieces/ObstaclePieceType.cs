@@ -16,6 +16,9 @@ namespace Match3Maker {
         public bool MatchWith(Piece piece) => false;
         public bool CanBeShuffled() => false;
         public bool CanBeMoved() => false;
+        public bool CanBeSwapped() => false;
+        public bool CanBeTriggered() => false;
+        public bool CanBeReplaced() => false;
 
     }
 

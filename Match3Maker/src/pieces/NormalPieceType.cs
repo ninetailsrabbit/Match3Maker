@@ -21,5 +21,8 @@ namespace Match3Maker {
 
         public bool CanBeShuffled() => true;
         public bool CanBeMoved() => true;
+        public bool CanBeSwapped() => true;
+        public bool CanBeTriggered() => false;
+        public bool CanBeReplaced() => true;
     }
 }

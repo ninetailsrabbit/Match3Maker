@@ -54,7 +54,6 @@ namespace Match3Maker {
 
             return previousPiece;
         }
-
         public bool SwapPieceWith(GridCell otherCell) {
             if (CanSwapPieceWith(otherCell)) {
 
@@ -85,7 +84,9 @@ namespace Match3Maker {
                 && !Piece.Locked
                 && !otherCell.Piece.Locked
                 && !Equals(otherCell)
-                && !Piece.Equals(otherCell.Piece);
+                && !Piece.Equals(otherCell.Piece)
+                && Piece.Type.CanBeSwapped()
+                && otherCell.Piece.Type.CanBeSwapped();
         }
 
         public bool InSameRowAs(GridCell cell) => cell.Row.Equals(Row);

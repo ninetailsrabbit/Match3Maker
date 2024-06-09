@@ -7,5 +7,9 @@ namespace Match3Maker {
         public bool MatchWith(Piece piece);
         public bool CanBeShuffled();
         public bool CanBeMoved();
+        public bool CanBeSwapped();
+        public bool CanBeTriggered();
+        public bool CanBeReplaced();
+
     }
 }
