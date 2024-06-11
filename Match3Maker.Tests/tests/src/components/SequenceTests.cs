@@ -92,6 +92,69 @@ namespace Match3MakerTests {
         }
 
         [Fact]
+        public void Should_Detect_Shape_Vertical_Automatically_When_Null() {
+            string shape = "square";
+
+            var cells = new List<GridCell>() {
+                new(2, 1, new Piece(_pieceFactory.CreateNormalPiece(shape))),
+                new(2, 2, new Piece(_pieceFactory.CreateNormalPiece(shape))),
+                new(2, 3, new Piece(_pieceFactory.CreateNormalPiece(shape)))
+            };
+
+            var sequence = new Sequence(cells);
+
+            Assert.Equal(Sequence.SHAPES.VERTICAL, sequence.Shape);
+
+
+        }
+
+        [Fact]
+        public void Should_Detect_Shape_Horizontal_Automatically_When_Null() {
+            string shape = "square";
+
+            var cells = new List<GridCell>() {
+               new(2, 1, new Piece(_pieceFactory.CreateNormalPiece(shape))),
+                new(3, 1, new Piece(_pieceFactory.CreateNormalPiece(shape))),
+                new(4, 1, new Piece(_pieceFactory.CreateNormalPiece(shape)))
+            };
+
+            var sequence = new Sequence(cells);
+
+            Assert.Equal(Sequence.SHAPES.HORIZONTAL, sequence.Shape);
+        }
+
+        [Fact]
+        public void Should_Detect_Shape_Diagonal_Automatically_When_Null() {
+            string shape = "square";
+
+            var cells = new List<GridCell>() {
+                new(2, 1, new Piece(_pieceFactory.CreateNormalPiece(shape))),
+                new(3, 2, new Piece(_pieceFactory.CreateNormalPiece(shape))),
+                new(4, 3, new Piece(_pieceFactory.CreateNormalPiece(shape)))
+            };
+
+            var sequence = new Sequence(cells);
+
+            Assert.Equal(Sequence.SHAPES.DIAGONAL, sequence.Shape);
+        }
+
+
+        [Fact]
+        public void Should_Detect_Shape_Irregular_Automatically_When_Null() {
+            string shape = "square";
+
+            var cells = new List<GridCell>() {
+                new(2, 4, new Piece(_pieceFactory.CreateNormalPiece(shape))),
+                new(6, 3, new Piece(_pieceFactory.CreateNormalPiece(shape))),
+                new(7, 5, new Piece(_pieceFactory.CreateNormalPiece(shape)))
+            };
+
+            var sequence = new Sequence(cells);
+
+            Assert.Equal(Sequence.SHAPES.IRREGULAR, sequence.Shape);
+        }
+
+        [Fact]
         public void Should_Retrieve_Correct_Horizontal_Edge_Cells() {
             string shape = "triangle";
 
@@ -130,10 +193,10 @@ namespace Match3MakerTests {
         public void Should_Retrieve_Correct_Vertical_Edge_Cells() {
             string shape = "triangle";
 
-            var cells = new List<GridCell>() { 
-                new(1, 1, new Piece(_pieceFactory.CreateNormalPiece(shape))), 
-                new(1, 2, new Piece(_pieceFactory.CreateNormalPiece(shape))), 
-                new(1, 3, new Piece(_pieceFactory.CreateNormalPiece(shape))) 
+            var cells = new List<GridCell>() {
+                new(1, 1, new Piece(_pieceFactory.CreateNormalPiece(shape))),
+                new(1, 2, new Piece(_pieceFactory.CreateNormalPiece(shape))),
+                new(1, 3, new Piece(_pieceFactory.CreateNormalPiece(shape)))
             };
             var sequence = new Sequence(cells, Sequence.SHAPES.VERTICAL);
 

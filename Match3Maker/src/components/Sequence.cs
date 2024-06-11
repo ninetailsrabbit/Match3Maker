@@ -2,16 +2,28 @@
 
 namespace Match3Maker {
 
-    public class Sequence(List<GridCell> cells, Sequence.SHAPES shape) : ICloneable {
+    public class Sequence : ICloneable {
         public enum SHAPES {
             HORIZONTAL,
             VERTICAL,
             T_SHAPE,
-            L_SHAPE
+            L_SHAPE,
+            DIAGONAL,
+            LINE_CONNECTED,
+            IRREGULAR
         }
 
-        public List<GridCell> Cells = [.. ValidCells(cells)];
-        public SHAPES Shape = shape;
+        public List<GridCell> Cells;
+        public SHAPES? Shape;
+
+
+        public Sequence(List<GridCell> cells, SHAPES? shape = null) {
+            Cells = [.. ValidCells(cells)];
+
+            shape ??= DetectShape(Cells);
+
+            Shape = shape;
+        }
 
         public int Size() => Cells.Count;
 
@@ -58,6 +70,9 @@ namespace Match3Maker {
         public bool IsVertical() => Shape.Equals(SHAPES.VERTICAL);
         public bool IsTShape() => Shape.Equals(SHAPES.T_SHAPE);
         public bool IsLShape() => Shape.Equals(SHAPES.L_SHAPE);
+        public bool IsDiagonalShape() => Shape.Equals(SHAPES.DIAGONAL);
+        public bool IsLineConnectedShape() => Shape.Equals(SHAPES.LINE_CONNECTED);
+
         public bool IsHorizontalOrVertical() => IsHorizontal() || IsVertical();
         #endregion
 
@@ -79,6 +94,28 @@ namespace Match3Maker {
                 });
 
             return [.. validCells];
+        }
+
+        private static SHAPES DetectShape(List<GridCell> cells) {
+            var cellsByIndex = cells.Select((value, index) => new { value, index });
+
+            bool isHorizontalShape = cellsByIndex.All(item => item.index == 0 || item.value.InSameRowAs(cells[item.index - 1]));
+
+            if (isHorizontalShape)
+                return SHAPES.HORIZONTAL;
+
+            bool isVerticalShape = cellsByIndex.All(item => item.index == 0 || item.value.InSameColumnAs(cells[item.index - 1]));
+
+            if (isVerticalShape)
+                return SHAPES.VERTICAL;
+
+            bool isDiagonalShape = cellsByIndex.All(item => item.index == 0 || item.value.InDiagonalWith(cells[item.index - 1]));
+
+            if (isDiagonalShape)
+                return SHAPES.DIAGONAL;
+
+
+            return SHAPES.IRREGULAR;
         }
     }
 
