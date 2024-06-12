@@ -461,6 +461,21 @@ namespace Match3Maker {
         #endregion
 
         #region Pieces
+
+        public void GenerateRandomPieceOnCells(IEnumerable<GridCell> cells, IEnumerable<Type>? only = null) {
+            foreach (GridCell cell in cells)
+                GenerateRandomPieceOnCell(cell, only);
+        }
+        public void GenerateRandomPieceOnCell(GridCell cell, IEnumerable<Type>? only = null) {
+            cell.AssignPiece(GenerateRandomPiece(only));
+        }
+        public Piece GenerateRandomPiece(IEnumerable<Type>? only = null) {
+            if (AvailablePieces.IsEmpty())
+                throw new InvalidOperationException("The available pieces on this board is empty, piece cannot be generated");
+
+            return PieceGenerator.Roll(AvailablePieces, only);
+        }
+
         public Board AddAvailablePieces(IList<Piece> pieces) {
             AvailablePieces.AddRange(pieces);
             AvailablePieces = AvailablePieces.RemoveDuplicates().ToList();
