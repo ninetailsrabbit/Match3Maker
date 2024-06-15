@@ -826,7 +826,6 @@ namespace Match3MakerTests {
             Piece prism = new(_pieceFactory.CreateNormalPiece("prism"));
             Piece special = new(_pieceFactory.CreateSpecialPiece("special"));
 
-
             List<Piece> pieces = [square, circle, triangle, prism, special];
 
             var board = new Board(8, 7, 10);
@@ -837,6 +836,13 @@ namespace Match3MakerTests {
             Assert.True(board.CreateSequenceOfCellsWithShape("circle").Cells.All(cell => cell.Piece.Type.Shape.Equals("circle")));
         }
 
+        [Fact]
+        public void Should_Throw_Exception_When_Try_To_Move_Pieces_And_Fill_When_Grid_Cells_Are_Not_Prepared() {
+            var board = new Board(8, 7, 10);
+
+            Assert.Throws<ArgumentException>(() => board.MovePiecesAndFillEmptyCells());
+
+        }
 
         [Fact]
         public void Should_Be_Able_To_Calculate_The_Pending_Fall_Moves_When_Sequence_Is_Consumed() {
@@ -845,7 +851,6 @@ namespace Match3MakerTests {
             Piece triangle = new(_pieceFactory.CreateNormalPiece("triangle"));
             Piece prism = new(_pieceFactory.CreateNormalPiece("prism"));
             Piece special = new(_pieceFactory.CreateSpecialPiece("special"));
-
 
             List<Piece> pieces = [square, circle, triangle, prism, special];
 
@@ -859,6 +864,90 @@ namespace Match3MakerTests {
 
             Assert.Equal(board.GridWidth, board.EmptyCells().Count);
             Assert.Equal(board.GridWidth, board.PendingFallMoves().Count);
+        }
+
+        [Fact]
+        public void Should_Create_A_Virtual_Board_Only_With_Fill_Updates_When_First_Row_Consumed() {
+            Piece square = new(_pieceFactory.CreateNormalPiece("square"));
+            Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
+            Piece triangle = new(_pieceFactory.CreateNormalPiece("triangle"));
+            Piece prism = new(_pieceFactory.CreateNormalPiece("prism"));
+            Piece special = new(_pieceFactory.CreateSpecialPiece("special"));
+
+            List<Piece> pieces = [square, circle, triangle, prism, special];
+
+            var board = new Board(8, 7, 10);
+
+            board.AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
+
+            board.CreateSequenceFromRow(0).Consume();
+
+            var virtualBoard = board.MovePiecesAndFillEmptyCells();
+
+            //No movements in the first row, only fills
+            Assert.True(virtualBoard.Updates.All(update => update.CurrentUpdateType.Equals(BoardCellUpdate.UPDATE_TYPE.FILL) && update.CellPieceFill.Cell.Row.Equals(0)));
+            Assert.Equal(board.GridWidth, virtualBoard.Updates.Count);
+
+            // Virtual board has no empty cells after the fill but the original board should keep unaltered.
+            Assert.Empty(virtualBoard.EmptyCells());
+            Assert.Equal(board.GridWidth, board.EmptyCells().Count);
+        }
+
+        [Fact]
+        public void Should_Create_A_Virtual_Board_Only_With_Fill_Updates_On_Entire_Column_Consumed() {
+            Piece square = new(_pieceFactory.CreateNormalPiece("square"));
+            Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
+            Piece triangle = new(_pieceFactory.CreateNormalPiece("triangle"));
+            Piece prism = new(_pieceFactory.CreateNormalPiece("prism"));
+            Piece special = new(_pieceFactory.CreateSpecialPiece("special"));
+
+            List<Piece> pieces = [square, circle, triangle, prism, special];
+
+            var board = new Board(8, 7, 10);
+
+            board.AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
+
+            board.CreateSequenceFromColumn(2).Consume();
+
+            var virtualBoard = board.MovePiecesAndFillEmptyCells();
+
+            //No movements in the first row, only fills
+            Assert.True(virtualBoard.Updates.All(update => update.CurrentUpdateType.Equals(BoardCellUpdate.UPDATE_TYPE.FILL) && update.CellPieceFill.Cell.Column.Equals(2)));
+            Assert.Equal(board.GridHeight, virtualBoard.Updates.Count);
+
+            // Virtual board has no empty cells after the fill but the original board should keep unaltered.
+            Assert.Empty(virtualBoard.EmptyCells());
+            Assert.Equal(board.GridHeight, board.EmptyCells().Count);
+        }
+
+        [Fact]
+        public void Should_Create_A_Virtual_Board_With_Movement_And_Fill() {
+            Piece square = new(_pieceFactory.CreateNormalPiece("square"));
+            Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
+            Piece triangle = new(_pieceFactory.CreateNormalPiece("triangle"));
+            Piece prism = new(_pieceFactory.CreateNormalPiece("prism"));
+            Piece special = new(_pieceFactory.CreateSpecialPiece("special"));
+
+            List<Piece> pieces = [square, circle, triangle, prism, special];
+
+            var board = new Board(8, 7, 10);
+            board.AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
+
+            var sequence = new Sequence([board.Cell(1, 2), board.Cell(2, 2), board.Cell(3, 2)], Sequence.SHAPES.HORIZONTAL);
+
+            //No updates in an initial board
+            Assert.Empty(board.MovePiecesAndFillEmptyCells().Updates);
+
+            sequence.Consume();
+
+            Assert.Equal(sequence.Size(), board.EmptyCells().Count);
+
+            var virtualBoard = board.MovePiecesAndFillEmptyCells();
+
+            // 6 Movements that represent moving down the row 0 and 1 after consuming the number 2.
+            Assert.Equal(sequence.Size() * 2, virtualBoard.MovementUpdates().Count);
+            Assert.Equal(sequence.Size(), virtualBoard.FillUpdates().Count);
+            Assert.Empty(virtualBoard.EmptyCells());
         }
     }
 
