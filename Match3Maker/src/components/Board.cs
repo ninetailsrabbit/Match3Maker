@@ -538,11 +538,18 @@ namespace Match3Maker {
 
             var pendingMoves = PendingFallMoves(virtualBoard.GridCells);
 
-            while (pendingMoves.Count > 0) {
+            while (pendingMoves.Count > 0 && !SelectedFillMode.Equals(FILL_MODES.IN_PLACE)) {
                 foreach (var currentCell in pendingMoves) {
                     GridCell? bottomCell = currentCell.NeighbourBottom;
 
                     if (bottomCell is not null) {
+
+                        if (SelectedFillMode.Equals(FILL_MODES.SIDE_DOWN) && bottomCell.HasPiece()) {
+                            bottomCell = currentCell.DiagonalNeighbourBottomLeft is not null && currentCell.DiagonalNeighbourBottomLeft.IsEmpty() ?
+                               currentCell.DiagonalNeighbourBottomLeft :
+                               currentCell.DiagonalNeighbourBottomRight;
+                        }
+
                         bottomCell.AssignPiece(currentCell.Piece);
                         currentCell.RemovePiece();
 
@@ -567,7 +574,7 @@ namespace Match3Maker {
 
             return cells.Where(cell => cell.HasPiece() && cell.Piece.Type.CanBeMoved() && cell.NeighbourBottom is not null)
                 .Where(cell => (SelectedFillMode.Equals(FILL_MODES.FALL_DOWN) && cell.NeighbourBottom.IsEmpty()) ||
-                 (SelectedFillMode.Equals(FILL_MODES.SIDE_DOWN) &&  (cell.NeighbourBottom.IsEmpty() || cell.NeighbourBottom.HasPiece()) && (cell.DiagonalNeighbourBottomRight.IsEmpty() || cell.DiagonalNeighbourBottomLeft.IsEmpty()))
+                 (SelectedFillMode.Equals(FILL_MODES.SIDE_DOWN) && (cell.NeighbourBottom.IsEmpty() || cell.NeighbourBottom.HasPiece()) && (cell.DiagonalNeighbourBottomRight.IsEmpty() || cell.DiagonalNeighbourBottomLeft.IsEmpty()))
                 )
                 .ToList();
         }

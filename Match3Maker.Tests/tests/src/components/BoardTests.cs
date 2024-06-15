@@ -949,6 +949,36 @@ namespace Match3MakerTests {
             Assert.Equal(sequence.Size(), virtualBoard.FillUpdates().Count);
             Assert.Empty(virtualBoard.EmptyCells());
         }
+
+        [Fact]
+        public void Should_Create_A_Virtual_Board_Only_With_Fill_When_Mode_Is_In_Place() {
+            Piece square = new(_pieceFactory.CreateNormalPiece("square"));
+            Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
+            Piece triangle = new(_pieceFactory.CreateNormalPiece("triangle"));
+            Piece prism = new(_pieceFactory.CreateNormalPiece("prism"));
+            Piece special = new(_pieceFactory.CreateSpecialPiece("special"));
+
+            List<Piece> pieces = [square, circle, triangle, prism, special];
+
+            var board = new Board(8, 7, 10);
+            board.ChangeFillMode(Board.FILL_MODES.IN_PLACE).AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
+
+            var sequence = new Sequence([board.Cell(1, 2), board.Cell(2, 2), board.Cell(3, 2)], Sequence.SHAPES.HORIZONTAL);
+
+            //No updates in an initial board
+            Assert.Empty(board.MovePiecesAndFillEmptyCells().Updates);
+
+            sequence.Consume();
+
+            Assert.Equal(sequence.Size(), board.EmptyCells().Count);
+
+            var virtualBoard = board.MovePiecesAndFillEmptyCells();
+
+            // No movements applied when fill it's IN_PLACE
+            Assert.Empty(virtualBoard.MovementUpdates());
+            Assert.Equal(sequence.Size(), virtualBoard.FillUpdates().Count);
+            Assert.Empty(virtualBoard.EmptyCells());
+        }
     }
 
 }
