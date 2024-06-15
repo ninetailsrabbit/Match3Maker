@@ -46,7 +46,6 @@ namespace Match3Maker {
         public void AssignPiece(Piece piece) {
             if (CanContainPiece && IsEmpty())
                 Piece = piece;
-
         }
         public Piece? RemovePiece() {
             Piece? previousPiece = Piece;
@@ -54,6 +53,16 @@ namespace Match3Maker {
 
             return previousPiece;
         }
+
+        public Piece? ReplacePiece(Piece newPiece) {
+            Piece previousPiece = Piece;
+
+            if (HasPiece())
+                Piece = newPiece;
+
+            return previousPiece;
+        }
+
         public bool SwapPieceWith(GridCell otherCell) {
             if (CanSwapPieceWith(otherCell)) {
 

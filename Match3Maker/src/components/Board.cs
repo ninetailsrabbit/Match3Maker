@@ -1,7 +1,35 @@
 ﻿using System.Numerics;
 using SystemExtensions;
+using static Match3Maker.BoardCellUpdate;
 
 namespace Match3Maker {
+
+    public sealed class VirtualBoard(List<GridCell> gridCells) {
+        public List<GridCell> GridCells = gridCells;
+        public List<BoardCellUpdate> Updates = [];
+
+        public void AddUpdate(BoardCellUpdate update) {
+            Updates.Add(update);
+        }
+
+    }
+    public sealed class BoardCellUpdate(UPDATE_TYPE currentUpdateType, CellPieceMovement? cellPieceMovement = null, CellPieceFill? cellPieceFill = null) {
+        public enum UPDATE_TYPE {
+            MOVEMENT,
+            FILL
+        }
+
+        public UPDATE_TYPE CurrentUpdateType = currentUpdateType;
+        public CellPieceMovement? CellPieceMovement = cellPieceMovement;
+        public CellPieceFill? CellPieceFill = cellPieceFill;
+        public bool IsMovement() => CurrentUpdateType.Equals(UPDATE_TYPE.MOVEMENT);
+        public bool IsFill() => CurrentUpdateType.Equals(UPDATE_TYPE.FILL);
+    }
+
+
+    public record CellPieceMovement(GridCell PreviousCell, GridCell NewCell, Piece Piece);
+    public record CellPieceFill(GridCell Cell, Piece Piece);
+
 
     public class Board {
         public static readonly int MIN_GRID_WIDTH = 3;
@@ -161,6 +189,9 @@ namespace Match3Maker {
 
             return this;
         }
+
+        public bool IsLocked() => Locked;
+        public bool IsFree() => !Locked;
 
         public void Lock() {
             Locked = true;
@@ -327,6 +358,14 @@ namespace Match3Maker {
         public List<GridCell> CellsThatCannotContainPiecesFromRow(int row) => CellsFromRow(row).Where(cell => !cell.CanContainPiece).ToList();
         public List<GridCell> CellsThatCanContainPiecesFromColumn(int column) => CellsFromColumn(column).Where(cell => cell.CanContainPiece).ToList();
         public List<GridCell> CellsThatCannotContainPiecesFromColumn(int column) => CellsFromColumn(column).Where(cell => !cell.CanContainPiece).ToList();
+        public Sequence CreateSequenceFromRow(int row) => new(CellsThatCanContainPiecesFromRow(row));
+        public Sequence CreateSequenceFromColumn(int column) => new(CellsThatCanContainPiecesFromColumn(column));
+        public Sequence CreateSequenceFromRowOfPieceType(int row, Type type) => new(CellsFromRowOfPieceType(row, type));
+        public Sequence CreateSequenceFromColumnOfPieceType(int column, Type type) => new(CellsFromColumnOfPieceType(column, type));
+        public Sequence CreateSequenceOfCellsWithPieceType(Type type) => new(CellsWithPieceType(type));
+        public Sequence CreateSequenceFromRowOfShape(int row, string shape) => new(CellsFromRowOfShape(row, shape));
+        public Sequence CreateSequenceFromColumnOfShape(int column, string shape) => new(CellsFromColumnOfShape(column, shape));
+        public Sequence CreateSequenceOfCellsWithShape(string shape) => new(CellsWithShape(shape));
 
         public List<GridCell> CellsFromColumn(int column) {
             List<GridCell> result = [];
@@ -363,11 +402,31 @@ namespace Match3Maker {
                 .ToList();
         }
 
+
         public List<GridCell> CellsWithPieceType(Type type) {
             return GridCells.SelectMany(cells => cells)
                 .Where(cell => cell.HasPiece() && cell.Piece.Type.GetType().Equals(type))
                 .ToList();
         }
+
+        public List<GridCell> CellsFromRowOfShape(int row, string shape) {
+            return CellsFromRow(row)
+                .Where(cell => cell.HasPiece() && cell.Piece.Type.Shape.Equals(shape, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        public List<GridCell> CellsFromColumnOfShape(int column, string shape) {
+            return CellsFromColumn(column)
+                .Where(cell => cell.HasPiece() && cell.Piece.Type.Shape.Equals(shape, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        public List<GridCell> CellsWithShape(string shape) {
+            return GridCells.SelectMany(cells => cells)
+                .Where(cell => cell.HasPiece() && cell.Piece.Type.Shape.Equals(shape, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
 
         public void UpdateGridCellsNeighbours() {
             GridCells.SelectMany(cells => cells).ToList().ForEach(cell => {
@@ -381,8 +440,6 @@ namespace Match3Maker {
                 cell.DiagonalNeighbourBottomLeft = Cell(cell.Column - 1, cell.Row + 1);
             });
         }
-
-
         public GridCell? FindGridCellWithPiece(Piece piece) => FindGridCellWithPiece(piece.Id);
         public GridCell? FindGridCellWithPiece(Guid id) => FindGridCellWithPiece(id.ToString());
         public GridCell? FindGridCellWithPiece(string id) {
@@ -458,6 +515,45 @@ namespace Match3Maker {
             }
         }
 
+        public VirtualBoard MovePiecesAndFillEmptyCells() {
+            var gridCellsCopy = GridCells.SelectMany(cells => cells).Select(cell => new GridCell(cell.Column, cell.Row, cell.Piece, cell.CanContainPiece)).ToList();
+
+            VirtualBoard virtualBoard = new(gridCellsCopy);
+
+            if (GridCells.Count > 0 && IsFree()) {
+
+                var pendingMoves = PendingFallMoves(virtualBoard.GridCells);
+
+                while (pendingMoves.Count > 0) {
+                    virtualBoard.Updates.Clear();
+
+                    foreach (var currentCell in pendingMoves) {
+                        GridCell? bottomCell = currentCell.NeighbourBottom;
+
+                        if (bottomCell is not null) {
+                            bottomCell.AssignPiece(currentCell.Piece);
+                            currentCell.RemovePiece();
+
+                            virtualBoard.AddUpdate(new BoardCellUpdate(UPDATE_TYPE.MOVEMENT, new(currentCell, bottomCell, bottomCell.Piece)));
+                        }
+                    }
+
+                    pendingMoves = PendingFallMoves(virtualBoard.GridCells);
+                }
+            }
+
+            return virtualBoard;
+        }
+
+        public List<GridCell> PendingFallMoves(IEnumerable<GridCell>? cells = null) {
+            cells ??= GridCells.SelectMany(cells => cells).Select(cell => cell).ToList();
+
+            return cells.Where(
+                    cell => cell.HasPiece() &&
+                    cell.Piece.Type.CanBeMoved() &&
+                    cell.NeighbourBottom is GridCell bottomCell && bottomCell.IsEmpty())
+                .ToList();
+        }
         #endregion
 
         #region Pieces

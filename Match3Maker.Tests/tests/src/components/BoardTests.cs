@@ -776,9 +776,90 @@ namespace Match3MakerTests {
             Assert.True(receivedEvents[0].Pieces().All(piece => piece.Type.GetType().Equals(typeof(NormalPieceType)) && piece.Type.Shape.Equals("circle")));
 
             board.ConsumedSequence -= listener;
-
         }
 
+        [Fact]
+        public void Should_Be_Able_Create_Sequences_From_Rows_In_Board() {
+            Piece square = new(_pieceFactory.CreateNormalPiece("square"));
+            Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
+            Piece triangle = new(_pieceFactory.CreateNormalPiece("triangle"));
+            Piece prism = new(_pieceFactory.CreateNormalPiece("prism"));
+            Piece special = new(_pieceFactory.CreateSpecialPiece("special"));
+
+
+            List<Piece> pieces = [square, circle, triangle, prism, special];
+
+            var board = new Board(8, 7, 10);
+
+            board.AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
+
+            Assert.True(board.CreateSequenceFromRow(1).Cells.All(cell => cell.Row.Equals(1)));
+            Assert.True(board.CreateSequenceFromRowOfPieceType(1, typeof(NormalPieceType)).Cells.All(cell => cell.Piece.Type is NormalPieceType));
+            Assert.True(board.CreateSequenceFromRowOfShape(1, "triangle").Cells.All(cell => cell.Piece.Type.Shape.Equals("triangle")));
+        }
+
+        [Fact]
+        public void Should_Be_Able_Create_Sequences_From_Columns_In_Board() {
+            Piece square = new(_pieceFactory.CreateNormalPiece("square"));
+            Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
+            Piece triangle = new(_pieceFactory.CreateNormalPiece("triangle"));
+            Piece prism = new(_pieceFactory.CreateNormalPiece("prism"));
+            Piece special = new(_pieceFactory.CreateSpecialPiece("special"));
+
+
+            List<Piece> pieces = [square, circle, triangle, prism, special];
+
+            var board = new Board(8, 7, 10);
+
+            board.AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
+
+            Assert.True(board.CreateSequenceFromColumn(1).Cells.All(cell => cell.Column.Equals(1)));
+            Assert.True(board.CreateSequenceFromColumnOfPieceType(1, typeof(NormalPieceType)).Cells.All(cell => cell.Piece.Type is NormalPieceType));
+            Assert.True(board.CreateSequenceFromColumnOfShape(1, "triangle").Cells.All(cell => cell.Piece.Type.Shape.Equals("triangle")));
+        }
+
+        [Fact]
+        public void Should_Be_Able_Create_Sequences_Of_Cells_With_Selected_Type() {
+            Piece square = new(_pieceFactory.CreateNormalPiece("square"));
+            Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
+            Piece triangle = new(_pieceFactory.CreateNormalPiece("triangle"));
+            Piece prism = new(_pieceFactory.CreateNormalPiece("prism"));
+            Piece special = new(_pieceFactory.CreateSpecialPiece("special"));
+
+
+            List<Piece> pieces = [square, circle, triangle, prism, special];
+
+            var board = new Board(8, 7, 10);
+
+            board.AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
+
+            Assert.True(board.CreateSequenceOfCellsWithPieceType(typeof(NormalPieceType)).Cells.All(cell => cell.Piece.Type is NormalPieceType));
+            Assert.True(board.CreateSequenceOfCellsWithShape("circle").Cells.All(cell => cell.Piece.Type.Shape.Equals("circle")));
+        }
+
+
+        [Fact]
+        public void Should_Be_Able_To_Calculate_The_Pending_Fall_Moves_When_Sequence_Is_Consumed() {
+            Piece square = new(_pieceFactory.CreateNormalPiece("square"));
+            Piece circle = new(_pieceFactory.CreateNormalPiece("circle"));
+            Piece triangle = new(_pieceFactory.CreateNormalPiece("triangle"));
+            Piece prism = new(_pieceFactory.CreateNormalPiece("prism"));
+            Piece special = new(_pieceFactory.CreateSpecialPiece("special"));
+
+
+            List<Piece> pieces = [square, circle, triangle, prism, special];
+
+            var board = new Board(8, 7, 10);
+
+            board.AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
+
+            Assert.Empty(board.PendingFallMoves());
+
+            board.CreateSequenceFromRow(2).Consume();
+
+            Assert.Equal(board.GridWidth, board.EmptyCells().Count);
+            Assert.Equal(board.GridWidth, board.PendingFallMoves().Count);
+        }
     }
 
 }

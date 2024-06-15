@@ -101,6 +101,21 @@ namespace Match3MakerTests {
         }
 
         [Fact]
+        public void Should_Replace_Piece_Only_When_Has_One_Assigned() {
+            var cell = new GridCell(1, 1);
+            var piece = new Piece(_pieceFactory.CreateNormalPiece("square"));
+            var newPiece = new Piece(_pieceFactory.CreateNormalPiece("square"));
+
+            Assert.True(cell.IsEmpty());
+            Assert.Null(cell.ReplacePiece(piece));
+
+            cell.AssignPiece(piece);
+
+            Assert.Equal(piece, cell.ReplacePiece(newPiece));
+            Assert.Equal(newPiece, cell.Piece);
+        }
+
+        [Fact]
         public void Should_Not_Swap_Piece_When_Conditions_Are_Not_Met() {
             var squarePiece = new Piece(_pieceFactory.CreateNormalPiece("square"));
             var circlePiece = new Piece(_pieceFactory.CreateNormalPiece("circle"));
