@@ -550,8 +550,10 @@ namespace Match3Maker {
                                currentCell.DiagonalNeighbourBottomRight;
                         }
 
-                        bottomCell.AssignPiece(currentCell.Piece);
-                        currentCell.RemovePiece();
+                        if (bottomCell is not null && bottomCell.IsEmpty()) {
+                            bottomCell.AssignPiece(currentCell.Piece);
+                            currentCell.RemovePiece();
+                        }
 
                         virtualBoard.AddUpdate(new BoardCellUpdate(UPDATE_TYPE.MOVEMENT, new(currentCell, bottomCell, bottomCell.Piece)));
                     }
