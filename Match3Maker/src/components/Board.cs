@@ -574,7 +574,8 @@ namespace Match3Maker {
 
             return cells.Where(cell => cell.HasPiece() && cell.Piece.Type.CanBeMoved() && cell.NeighbourBottom is not null)
                 .Where(cell => (SelectedFillMode.Equals(FILL_MODES.FALL_DOWN) && cell.NeighbourBottom.IsEmpty()) ||
-                 (SelectedFillMode.Equals(FILL_MODES.SIDE_DOWN) && (cell.NeighbourBottom.IsEmpty() || cell.NeighbourBottom.HasPiece()) && (cell.DiagonalNeighbourBottomRight.IsEmpty() || cell.DiagonalNeighbourBottomLeft.IsEmpty()))
+                 (SelectedFillMode.Equals(FILL_MODES.SIDE_DOWN) && (cell.NeighbourBottom.IsEmpty() || cell.NeighbourBottom.HasPiece())
+                 && (cell.DiagonalNeighbourBottomRight is not null && cell.DiagonalNeighbourBottomRight.IsEmpty() || cell.DiagonalNeighbourBottomLeft is not null && cell.DiagonalNeighbourBottomLeft.IsEmpty()))
                 )
                 .ToList();
         }
