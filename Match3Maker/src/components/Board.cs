@@ -302,6 +302,10 @@ namespace Match3Maker {
             return this;
         }
 
+        public GridCell? TopRightCornerCell() => Cell(GridWidth - 1, 0);
+        public GridCell? TopLeftCornerCell() => Cell(0, 0);
+        public GridCell? BottomRightCornerCell() => Cell(GridWidth - 1, GridHeight - 1);
+        public GridCell? BottomLeftCornerCell() => Cell(0, GridHeight - 1);
 
         public List<GridCell> UpperCellsFrom(GridCell cell, int distance) {
             List<GridCell> cells = [];
@@ -355,6 +359,59 @@ namespace Match3Maker {
 
             return cells;
         }
+
+        public List<GridCell> DiagonalTopRightCellsFrom(GridCell cell, int distance) {
+            List<GridCell> cells = [];
+
+            distance = Math.Clamp(distance, 0, GridWidth);
+
+            var currentCell = cell.DiagonalNeighbourTopRight;
+
+            if (distance > 0 && currentCell is not null)
+                cells.AddRange([currentCell, .. DiagonalTopRightCellsFrom(currentCell, distance - 1)]);
+
+            return cells;
+        }
+
+        public List<GridCell> DiagonalTopLeftCellsFrom(GridCell cell, int distance) {
+            List<GridCell> cells = [];
+
+            distance = Math.Clamp(distance, 0, GridWidth);
+
+            var currentCell = cell.DiagonalNeighbourTopLeft;
+
+            if (distance > 0 && currentCell is not null)
+                cells.AddRange([currentCell, .. DiagonalTopLeftCellsFrom(currentCell, distance - 1)]);
+
+            return cells;
+        }
+
+        public List<GridCell> DiagonalBottomLeftCellsFrom(GridCell cell, int distance) {
+            List<GridCell> cells = [];
+
+            distance = Math.Clamp(distance, 0, GridWidth);
+
+            var currentCell = cell.DiagonalNeighbourBottomLeft;
+
+            if (distance > 0 && currentCell is not null)
+                cells.AddRange([currentCell, .. DiagonalBottomLeftCellsFrom(currentCell, distance - 1)]);
+
+            return cells;
+        }
+
+        public List<GridCell> DiagonalBottomRightCellsFrom(GridCell cell, int distance) {
+            List<GridCell> cells = [];
+
+            distance = Math.Clamp(distance, 0, GridWidth);
+
+            var currentCell = cell.DiagonalNeighbourBottomRight;
+
+            if (distance > 0 && currentCell is not null)
+                cells.AddRange([currentCell, .. DiagonalBottomRightCellsFrom(currentCell, distance - 1)]);
+
+            return cells;
+        }
+
         public List<Piece?> UpperCellPiecesFrom(GridCell cell, int distance) =>
          UpperCellsFrom(cell, distance).Select(cell => cell.Piece).ToList();
         public List<Piece?> BottomCellPiecesFrom(GridCell cell, int distance)

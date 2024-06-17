@@ -422,6 +422,76 @@ namespace Match3MakerTests {
         }
 
         [Fact]
+        public void Should_Return_Diagonal_Top_Right_Cells_From_Selected_Cell() {
+            var board = new Board(4, 5, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            board.PrepareGridCells();
+
+            var originCell = board.BottomLeftCornerCell();
+            var diagonalTopRightCells = board.DiagonalTopRightCellsFrom(originCell, board.GridWidth);
+
+            Assert.Equal(board.GridWidth - 1, diagonalTopRightCells.Count);
+            Assert.True(diagonalTopRightCells.All(cell => !cell.Row.Equals(originCell.Row) && !cell.Column.Equals(originCell.Column)));
+
+            diagonalTopRightCells = board.DiagonalTopRightCellsFrom(originCell, 1);
+
+            Assert.Single(diagonalTopRightCells);
+            Assert.Equal(originCell.DiagonalNeighbourTopRight, diagonalTopRightCells[0]);
+        }
+
+        [Fact]
+        public void Should_Return_Diagonal_Top_Left_Cells_From_Selected_Cell() {
+            var board = new Board(4, 5, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            board.PrepareGridCells();
+
+            var originCell = board.BottomRightCornerCell();
+            var diagonalTopLeftCells = board.DiagonalTopLeftCellsFrom(originCell, board.GridWidth);
+
+            Assert.Equal(board.GridWidth - 1, diagonalTopLeftCells.Count);
+            Assert.True(diagonalTopLeftCells.All(cell => !cell.Row.Equals(originCell.Row) && !cell.Column.Equals(originCell.Column)));
+
+            diagonalTopLeftCells = board.DiagonalTopLeftCellsFrom(originCell, 1);
+
+            Assert.Single(diagonalTopLeftCells);
+            Assert.Equal(originCell.DiagonalNeighbourTopLeft, diagonalTopLeftCells[0]);
+
+        }
+
+        [Fact]
+        public void Should_Return_Diagonal_Bottom_Left_Cells_From_Selected_Cell() {
+            var board = new Board(4, 5, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            board.PrepareGridCells();
+
+            var originCell = board.TopRightCornerCell();
+            var diagonalBottomLeftCells = board.DiagonalBottomLeftCellsFrom(originCell, board.GridWidth);
+
+            Assert.Equal(board.GridWidth - 1, diagonalBottomLeftCells.Count);
+            Assert.True(diagonalBottomLeftCells.All(cell => !cell.Row.Equals(originCell.Row) && !cell.Column.Equals(originCell.Column)));
+
+            diagonalBottomLeftCells = board.DiagonalBottomLeftCellsFrom(originCell, 1);
+
+            Assert.Single(diagonalBottomLeftCells);
+            Assert.Equal(originCell.DiagonalNeighbourBottomLeft, diagonalBottomLeftCells[0]);
+
+        }
+
+        [Fact]
+        public void Should_Return_Diagonal_Bottom_Right_Cells_From_Selected_Cell() {
+            var board = new Board(4, 5, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+            board.PrepareGridCells();
+
+            var originCell = board.TopLeftCornerCell();
+            var diagonalBottomRightCells = board.DiagonalBottomRightCellsFrom(originCell, board.GridWidth);
+
+            Assert.Equal(board.GridWidth - 1, diagonalBottomRightCells.Count);
+            Assert.True(diagonalBottomRightCells.All(cell => !cell.Row.Equals(originCell.Row) && !cell.Column.Equals(originCell.Column)));
+
+            diagonalBottomRightCells = board.DiagonalBottomRightCellsFrom(originCell, 1);
+
+            Assert.Single(diagonalBottomRightCells);
+            Assert.Equal(originCell.DiagonalNeighbourBottomRight, diagonalBottomRightCells[0]);
+        }
+
+        [Fact]
         public void Should_Return_Selected_Row_Cells() {
             var board = new Board(8, 7, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
             board.PrepareGridCells();
