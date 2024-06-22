@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using SystemExtensions;
+using Extensionator;
 
 namespace Match3Maker {
     public sealed class PieceWeightGenerator : IPieceGenerator {

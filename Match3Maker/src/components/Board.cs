@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using SystemExtensions;
+using Extensionator;
 using static Match3Maker.BoardCellUpdate;
 
 namespace Match3Maker {
