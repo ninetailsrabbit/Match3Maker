@@ -309,6 +309,31 @@ namespace Match3MakerTests {
         }
 
         [Fact]
+        public void Should_Retrieve_Cross_Diagonal_Cells_From_Origin_One() {
+            var board = new Board(5, 6, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+
+            board.PrepareGridCells();
+
+            var originCell = board.TopLeftCornerCell();
+            var crossDiagonalCells = board.CrossDiagonalCellsFrom(originCell);
+
+            Assert.Equal(board.GridWidth - 1, crossDiagonalCells.Count);
+
+            foreach (var cell in crossDiagonalCells) {
+                Assert.False(cell.InSameRowAs(originCell) && cell.InSameColumnAs(originCell));
+            }
+
+            originCell = board.Cell(3, 2);
+            crossDiagonalCells = board.CrossDiagonalCellsFrom(originCell);
+
+            Assert.Equal(7, crossDiagonalCells.Count);
+
+            foreach (var cell in crossDiagonalCells) {
+                Assert.False(cell.InSameRowAs(originCell) && cell.InSameColumnAs(originCell));
+            }
+        }
+
+        [Fact]
         public void Should_Detect_Border_And_Corners() {
             var board = new Board(8, 7, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
 

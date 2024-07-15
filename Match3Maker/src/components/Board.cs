@@ -520,7 +520,18 @@ namespace Match3Maker {
             return CellsFromRow(originCell.Row)
                     .Concat(CellsFromColumn(originCell.Column))
                     .RemoveDuplicates()
-                    .Select(cell => GridCells[cell.Column][cell.Row])
+                    .ToList();
+        }
+
+        public List<GridCell> CrossDiagonalCellsFrom(GridCell originCell) {
+            var distance = GridWidth + GridHeight;
+
+            return DiagonalTopLeftCellsFrom(originCell, distance)
+                    .Concat(DiagonalTopRightCellsFrom(originCell, distance))
+                    .Concat(DiagonalBottomLeftCellsFrom(originCell, distance))
+                    .Concat(DiagonalBottomRightCellsFrom(originCell, distance))
+                    .RemoveDuplicates()
+                    .RemoveNullables()
                     .ToList();
         }
 
