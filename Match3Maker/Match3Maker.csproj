@@ -14,7 +14,7 @@
 
 	<PropertyGroup>
 		<Title>Ninetailsrabbit.Match3Maker</Title>
-		<Version>1.2.0</Version>
+		<Version>1.2.2</Version>
 		<Description>This lightweight library provides the core logic and functionality you need to build engaging match-3 games. Focus on game design and mechanics while leaving the complex logic to this library</Description>
 		<Copyright>© 2024 Ninetailsrabbit</Copyright>
 		<Authors>Ninetailsrabbit</Authors>
@@ -39,7 +39,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Ninetailsrabbit.Extensionator" Version="0.1.0" />
+	  <PackageReference Include="Ninetailsrabbit.Extensionator" Version="0.2.2" />
 	</ItemGroup>
 	
 </Project>

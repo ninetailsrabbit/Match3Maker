@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Extensionator;
+﻿using Extensionator;
 
 namespace Match3Maker {
     public sealed class PieceWeightGenerator : IPieceGenerator {
@@ -30,7 +29,6 @@ namespace Match3Maker {
 
                 float roll = _rng.NextFloat(0f, totalWeight);
 
-                
                 foreach (Piece piece in selectedPieces) {
 
                     if (roll <= piece.TotalAccumWeight) {

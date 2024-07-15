@@ -16,7 +16,6 @@ namespace Match3Maker {
         public List<GridCell> Cells;
         public SHAPES? Shape;
 
-
         public Sequence(List<GridCell> cells, SHAPES? shape = null) {
             Cells = [.. ValidCells(cells)];
 

@@ -1,5 +1,5 @@
-﻿using System.Numerics;
-using Extensionator;
+﻿using Extensionator;
+using System.Numerics;
 using static Match3Maker.BoardCellUpdate;
 
 namespace Match3Maker {
@@ -22,7 +22,7 @@ namespace Match3Maker {
 
         public GridCell? Cell(int column, int row) => GridCells.FirstOrDefault(cell => cell.Column.Equals(column) && cell.Row.Equals(row));
         public List<GridCell> EmptyCells() => GridCells.Where(cell => cell.IsEmpty() && cell.CanContainPiece).ToList();
-        public void AddUpdate(BoardCellUpdate update) {
+        public void Update(BoardCellUpdate update) {
             Updates.Add(update);
         }
         public List<BoardCellUpdate> MovementUpdates() => Updates.Where(update => update.CurrentUpdateType.Equals(UPDATE_TYPE.MOVEMENT)).ToList();
@@ -220,7 +220,6 @@ namespace Match3Maker {
         #endregion
 
         #region Cells
-
         public GridCell? Cell(Vector2 position) => Cell((int)position.Y, ((int)position.X));
         public GridCell? Cell(int column, int row) {
             if (GridCells.Count > 0
@@ -233,8 +232,7 @@ namespace Match3Maker {
             return null;
         }
 
-        public Vector2 CellPosition(GridCell cell)
-            => new(CellSize.X * cell.Column + Offset.X, CellSize.Y * cell.Row + Offset.Y);
+        public Vector2 CellPosition(GridCell cell) => new(CellSize.X * cell.Column + Offset.X, CellSize.Y * cell.Row + Offset.Y);
 
         public Board PrepareGridCells(List<Vector2>? disabledCells = null, bool overwrite = false) {
             if (GridCells.IsEmpty() || overwrite) {
@@ -499,6 +497,33 @@ namespace Match3Maker {
                 .ToList();
         }
 
+        public static List<GridCell> AdjacentCellsFrom(GridCell originCell, bool includeDiagonals = false) {
+#pragma warning disable 8601
+            List<GridCell> adjacentCells = [
+                originCell.NeighbourUp,
+                originCell.NeighbourRight,
+                originCell.NeighbourLeft,
+                originCell.NeighbourBottom,
+            ];
+
+            if (includeDiagonals)
+                adjacentCells.AddRange([originCell.DiagonalNeighbourBottomRight,
+                    originCell.DiagonalNeighbourBottomLeft,
+                    originCell.DiagonalNeighbourTopRight,
+                    originCell.DiagonalNeighbourTopLeft
+                ]);
+
+            return adjacentCells.RemoveNullables().RemoveDuplicates().ToList();
+        }
+
+        public List<GridCell> CrossCellsFrom(GridCell originCell) {
+            return CellsFromRow(originCell.Row)
+                    .Concat(CellsFromColumn(originCell.Column))
+                    .RemoveDuplicates()
+                    .Select(cell => GridCells[cell.Column][cell.Row])
+                    .ToList();
+        }
+
 
         public void UpdateGridCellsNeighbours() {
             GridCells.SelectMany(cells => cells).ToList().ForEach(cell => {
@@ -612,7 +637,7 @@ namespace Match3Maker {
                             currentCell.RemovePiece();
                         }
 
-                        virtualBoard.AddUpdate(new BoardCellUpdate(UPDATE_TYPE.MOVEMENT, new(currentCell, bottomCell, bottomCell.Piece)));
+                        virtualBoard.Update(new BoardCellUpdate(UPDATE_TYPE.MOVEMENT, new(currentCell, bottomCell, bottomCell.Piece)));
                     }
                 }
 
@@ -622,7 +647,7 @@ namespace Match3Maker {
             foreach (var emptyCell in virtualBoard.EmptyCells()) {
                 GenerateRandomPieceOnCell(emptyCell);
 
-                virtualBoard.AddUpdate(new BoardCellUpdate(UPDATE_TYPE.FILL, null, new(emptyCell, emptyCell.Piece)));
+                virtualBoard.Update(new BoardCellUpdate(UPDATE_TYPE.FILL, null, new(emptyCell, emptyCell.Piece)));
             }
 
             return virtualBoard;

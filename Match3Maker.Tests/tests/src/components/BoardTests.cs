@@ -249,6 +249,44 @@ namespace Match3MakerTests {
         }
 
         [Fact]
+        public void Should_Retrieve_Adjacent_Cells_From_Origin_One_With_Diagonals_As_Option() {
+            var board = new Board(5, 6, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+
+            board.PrepareGridCells();
+
+            var originCell = board.TopLeftCornerCell();
+            var adjacentCells = board.AdjacentCellsFrom(originCell);
+
+            Assert.Equal(2, adjacentCells.Count);
+
+            foreach (var cell in adjacentCells) {
+                Assert.True(cell.IsColumnNeighbourOf(originCell) || cell.IsRowNeighbourOf(originCell));
+            }
+
+            adjacentCells = board.AdjacentCellsFrom(originCell, true);
+
+            Assert.Equal(3, adjacentCells.Count);
+            Assert.Contains(originCell.DiagonalNeighbourBottomRight, adjacentCells);
+
+            originCell = board.Cell(1, 1);
+            adjacentCells = board.AdjacentCellsFrom(originCell);
+
+            Assert.Equal(4, adjacentCells.Count);
+
+            foreach (var cell in adjacentCells) {
+                Assert.True(cell.IsColumnNeighbourOf(originCell) || cell.IsRowNeighbourOf(originCell));
+            }
+
+            adjacentCells = board.AdjacentCellsFrom(originCell, true);
+
+            Assert.Equal(4 * 2, adjacentCells.Count);
+            Assert.Contains(originCell.DiagonalNeighbourBottomLeft, adjacentCells);
+            Assert.Contains(originCell.DiagonalNeighbourBottomRight, adjacentCells);
+            Assert.Contains(originCell.DiagonalNeighbourTopLeft, adjacentCells);
+            Assert.Contains(originCell.DiagonalNeighbourTopRight, adjacentCells);
+        }
+
+        [Fact]
         public void Should_Detect_Border_And_Corners() {
             var board = new Board(8, 7, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
 
