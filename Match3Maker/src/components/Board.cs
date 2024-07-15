@@ -497,7 +497,7 @@ namespace Match3Maker {
                 .ToList();
         }
 
-        public static List<GridCell> AdjacentCellsFrom(GridCell originCell, bool includeDiagonals = false) {
+        public List<GridCell> AdjacentCellsFrom(GridCell originCell, bool includeDiagonals = false) {
 #pragma warning disable 8601
             List<GridCell> adjacentCells = [
                 originCell.NeighbourUp,

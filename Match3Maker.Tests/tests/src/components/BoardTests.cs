@@ -287,6 +287,28 @@ namespace Match3MakerTests {
         }
 
         [Fact]
+        public void Should_Retrieve_Cross_Cells_From_Origin_One() {
+            var board = new Board(5, 6, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
+
+            board.PrepareGridCells();
+
+            var originCell = board.TopLeftCornerCell();
+            var crossCells = board.CrossCellsFrom(originCell);
+
+            // -1 it's because the function removes the duplicated connection cell between row and column
+            Assert.Equal((board.GridWidth + board.GridHeight) - 1, crossCells.Count);
+
+            foreach (var cell in crossCells) {
+                Assert.True(cell.InSameRowAs(originCell) || cell.InSameColumnAs(originCell));
+            }
+
+            originCell = board.Cell(2, 2);
+            crossCells = board.CrossCellsFrom(originCell);
+
+            Assert.Equal((board.GridWidth + board.GridHeight) - 1, crossCells.Count);
+        }
+
+        [Fact]
         public void Should_Detect_Border_And_Corners() {
             var board = new Board(8, 7, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
 
