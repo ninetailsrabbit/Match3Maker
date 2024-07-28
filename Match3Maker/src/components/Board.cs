@@ -25,20 +25,20 @@ namespace Match3Maker {
         public void Update(BoardCellUpdate update) {
             Updates.Add(update);
         }
-        public List<BoardCellUpdate> MovementUpdates() => Updates.Where(update => update.CurrentUpdateType.Equals(UPDATE_TYPE.MOVEMENT)).ToList();
-        public List<BoardCellUpdate> FillUpdates() => Updates.Where(update => update.CurrentUpdateType.Equals(UPDATE_TYPE.FILL)).ToList();
+        public List<BoardCellUpdate> MovementUpdates() => Updates.Where(update => update.CurrentUpdateType.Equals(UpdateType.Movement)).ToList();
+        public List<BoardCellUpdate> FillUpdates() => Updates.Where(update => update.CurrentUpdateType.Equals(UpdateType.Fill)).ToList();
     }
-    public sealed class BoardCellUpdate(UPDATE_TYPE currentUpdateType, CellPieceMovement? cellPieceMovement = null, CellPieceFill? cellPieceFill = null) {
-        public enum UPDATE_TYPE {
-            MOVEMENT,
-            FILL
+    public sealed class BoardCellUpdate(UpdateType currentUpdateType, CellPieceMovement? cellPieceMovement = null, CellPieceFill? cellPieceFill = null) {
+        public enum UpdateType {
+            Movement,
+            Fill
         }
 
-        public UPDATE_TYPE CurrentUpdateType = currentUpdateType;
+        public UpdateType CurrentUpdateType = currentUpdateType;
         public CellPieceMovement? CellPieceMovement = cellPieceMovement;
         public CellPieceFill? CellPieceFill = cellPieceFill;
-        public bool IsMovement() => CurrentUpdateType.Equals(UPDATE_TYPE.MOVEMENT);
-        public bool IsFill() => CurrentUpdateType.Equals(UPDATE_TYPE.FILL);
+        public bool IsMovement() => CurrentUpdateType.Equals(UpdateType.Movement);
+        public bool IsFill() => CurrentUpdateType.Equals(UpdateType.Fill);
     }
 
     public record CellPieceMovement(GridCell PreviousCell, GridCell NewCell, Piece Piece);
@@ -47,16 +47,16 @@ namespace Match3Maker {
     #endregion
 
     public class Board {
-        public static readonly int MIN_GRID_WIDTH = 3;
-        public static readonly int MIN_GRID_HEIGHT = 3;
+        public static readonly int MinGridWidth = 3;
+        public static readonly int MinGridHeight = 3;
 
-        public enum FILL_MODES {
-            FALL_DOWN,
-            IN_PLACE,
-            SIDE_DOWN
+        public enum FillModes {
+            FallDown,
+            InPlace,
+            SideDown
         }
 
-        public FILL_MODES SelectedFillMode = FILL_MODES.FALL_DOWN;
+        public FillModes SelectedFillMode = FillModes.FallDown;
 
         #region Events
         public event Action? PreparedBoard;
@@ -67,8 +67,8 @@ namespace Match3Maker {
         public event ConsumedSequenceEventHandler? ConsumedSequence;
         #endregion
 
-        public int GridWidth { get => _gridWidth; set { _gridWidth = Math.Max(MIN_GRID_WIDTH, value); } }
-        public int GridHeight { get => _gridHeight; set { _gridHeight = Math.Max(MIN_GRID_HEIGHT, value); } }
+        public int GridWidth { get => _gridWidth; set { _gridWidth = Math.Max(MinGridWidth, value); } }
+        public int GridHeight { get => _gridHeight; set { _gridHeight = Math.Max(MinGridHeight, value); } }
 
         private int _gridWidth;
         private int _gridHeight;
@@ -158,7 +158,7 @@ namespace Match3Maker {
             return this;
         }
 
-        public Board ChangeFillMode(FILL_MODES mode) {
+        public Board ChangeFillMode(FillModes mode) {
             SelectedFillMode = mode;
 
             return this;
@@ -428,13 +428,13 @@ namespace Match3Maker {
         public List<GridCell> CellsThatCannotContainPiecesFromRow(int row) => CellsFromRow(row).Where(cell => !cell.CanContainPiece).ToList();
         public List<GridCell> CellsThatCanContainPiecesFromColumn(int column) => CellsFromColumn(column).Where(cell => cell.CanContainPiece).ToList();
         public List<GridCell> CellsThatCannotContainPiecesFromColumn(int column) => CellsFromColumn(column).Where(cell => !cell.CanContainPiece).ToList();
-        public Sequence CreateSequenceFromRow(int row) => new(CellsThatCanContainPiecesFromRow(row), Sequence.SHAPES.HORIZONTAL);
-        public Sequence CreateSequenceFromColumn(int column) => new(CellsThatCanContainPiecesFromColumn(column), Sequence.SHAPES.VERTICAL);
-        public Sequence CreateSequenceFromRowOfPieceType(int row, Type type) => new(CellsFromRowOfPieceType(row, type), Sequence.SHAPES.HORIZONTAL);
-        public Sequence CreateSequenceFromColumnOfPieceType(int column, Type type) => new(CellsFromColumnOfPieceType(column, type), Sequence.SHAPES.VERTICAL);
+        public Sequence CreateSequenceFromRow(int row) => new(CellsThatCanContainPiecesFromRow(row), Sequence.Shapes.Horizontal);
+        public Sequence CreateSequenceFromColumn(int column) => new(CellsThatCanContainPiecesFromColumn(column), Sequence.Shapes.Vertical);
+        public Sequence CreateSequenceFromRowOfPieceType(int row, Type type) => new(CellsFromRowOfPieceType(row, type), Sequence.Shapes.Horizontal);
+        public Sequence CreateSequenceFromColumnOfPieceType(int column, Type type) => new(CellsFromColumnOfPieceType(column, type), Sequence.Shapes.Vertical);
         public Sequence CreateSequenceOfCellsWithPieceType(Type type) => new(CellsWithPieceType(type));
-        public Sequence CreateSequenceFromRowOfShape(int row, string shape) => new(CellsFromRowOfShape(row, shape), Sequence.SHAPES.HORIZONTAL);
-        public Sequence CreateSequenceFromColumnOfShape(int column, string shape) => new(CellsFromColumnOfShape(column, shape), Sequence.SHAPES.VERTICAL);
+        public Sequence CreateSequenceFromRowOfShape(int row, string shape) => new(CellsFromRowOfShape(row, shape), Sequence.Shapes.Horizontal);
+        public Sequence CreateSequenceFromColumnOfShape(int column, string shape) => new(CellsFromColumnOfShape(column, shape), Sequence.Shapes.Vertical);
         public Sequence CreateSequenceOfCellsWithShape(string shape) => new(CellsWithShape(shape));
 
         public List<GridCell> CellsFromColumn(int column) {
@@ -631,13 +631,13 @@ namespace Match3Maker {
 
             var pendingMoves = PendingFallMoves(virtualBoard.GridCells);
 
-            while (pendingMoves.Count > 0 && !SelectedFillMode.Equals(FILL_MODES.IN_PLACE)) {
+            while (pendingMoves.Count > 0 && !SelectedFillMode.Equals(FillModes.InPlace)) {
                 foreach (var currentCell in pendingMoves) {
                     GridCell? bottomCell = currentCell.NeighbourBottom;
 
                     if (bottomCell is not null) {
 
-                        if (SelectedFillMode.Equals(FILL_MODES.SIDE_DOWN) && bottomCell.HasPiece()) {
+                        if (SelectedFillMode.Equals(FillModes.SideDown) && bottomCell.HasPiece()) {
                             bottomCell = currentCell.DiagonalNeighbourBottomLeft is not null && currentCell.DiagonalNeighbourBottomLeft.IsEmpty() ?
                                currentCell.DiagonalNeighbourBottomLeft :
                                currentCell.DiagonalNeighbourBottomRight;
@@ -648,7 +648,7 @@ namespace Match3Maker {
                             currentCell.RemovePiece();
                         }
 
-                        virtualBoard.Update(new BoardCellUpdate(UPDATE_TYPE.MOVEMENT, new(currentCell, bottomCell, bottomCell.Piece)));
+                        virtualBoard.Update(new BoardCellUpdate(UpdateType.Movement, new(currentCell, bottomCell, bottomCell.Piece)));
                     }
                 }
 
@@ -658,7 +658,7 @@ namespace Match3Maker {
             foreach (var emptyCell in virtualBoard.EmptyCells()) {
                 GenerateRandomPieceOnCell(emptyCell);
 
-                virtualBoard.Update(new BoardCellUpdate(UPDATE_TYPE.FILL, null, new(emptyCell, emptyCell.Piece)));
+                virtualBoard.Update(new BoardCellUpdate(UpdateType.Fill, null, new(emptyCell, emptyCell.Piece)));
             }
 
             return virtualBoard;
@@ -668,8 +668,8 @@ namespace Match3Maker {
             cells ??= GridCells.SelectMany(cells => cells).Select(cell => cell).ToList();
 
             return cells.Where(cell => cell.HasPiece() && cell.Piece.Type.CanBeMoved() && cell.NeighbourBottom is not null)
-                .Where(cell => (SelectedFillMode.Equals(FILL_MODES.FALL_DOWN) && cell.NeighbourBottom.IsEmpty()) ||
-                 (SelectedFillMode.Equals(FILL_MODES.SIDE_DOWN) && (cell.NeighbourBottom.IsEmpty() || cell.NeighbourBottom.HasPiece())
+                .Where(cell => (SelectedFillMode.Equals(FillModes.FallDown) && cell.NeighbourBottom.IsEmpty()) ||
+                 (SelectedFillMode.Equals(FillModes.SideDown) && (cell.NeighbourBottom.IsEmpty() || cell.NeighbourBottom.HasPiece())
                  && (cell.DiagonalNeighbourBottomRight is not null && cell.DiagonalNeighbourBottomRight.IsEmpty() || cell.DiagonalNeighbourBottomLeft is not null && cell.DiagonalNeighbourBottomLeft.IsEmpty()))
                 )
                 .ToList();

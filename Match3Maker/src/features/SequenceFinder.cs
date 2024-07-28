@@ -55,13 +55,13 @@ namespace Match3Maker {
                             currentMatches.Add(cell);
 
                             if (currentMatches.Count.Equals(MaxMatch)) {
-                                AddSequenceFromMatches(sequences, currentMatches, Sequence.SHAPES.HORIZONTAL);
+                                AddSequenceFromMatches(sequences, currentMatches, Sequence.Shapes.Horizontal);
                                 currentMatches.Clear();
                             }
                         }
                         else {
                             if (currentMatches.Count.IsBetween(MinMatch, MaxMatch)) {
-                                AddSequenceFromMatches(sequences, currentMatches, Sequence.SHAPES.HORIZONTAL);
+                                AddSequenceFromMatches(sequences, currentMatches, Sequence.Shapes.Horizontal);
                             }
 
                             currentMatches.Clear();
@@ -71,7 +71,7 @@ namespace Match3Maker {
 
                         if (index.Equals(cells.LastIndex())) {
                             if (currentMatches.Count.IsBetween(MinMatch, MaxMatch))
-                                AddSequenceFromMatches(sequences, currentMatches, Sequence.SHAPES.HORIZONTAL);
+                                AddSequenceFromMatches(sequences, currentMatches, Sequence.Shapes.Horizontal);
                         }
 
                     });
@@ -101,13 +101,13 @@ namespace Match3Maker {
                             currentMatches.Add(cell);
 
                             if (currentMatches.Count.Equals(MaxMatch)) {
-                                AddSequenceFromMatches(sequences, currentMatches, Sequence.SHAPES.VERTICAL);
+                                AddSequenceFromMatches(sequences, currentMatches, Sequence.Shapes.Vertical);
                                 currentMatches.Clear();
                             }
                         }
                         else {
                             if (currentMatches.Count.IsBetween(MinMatch, MaxMatch))
-                                AddSequenceFromMatches(sequences, currentMatches, Sequence.SHAPES.VERTICAL);
+                                AddSequenceFromMatches(sequences, currentMatches, Sequence.Shapes.Vertical);
 
                             currentMatches.Clear();
                             currentMatches.Add(cell);
@@ -115,7 +115,7 @@ namespace Match3Maker {
 
 
                         if (index.Equals(cells.LastIndex()) && currentMatches.Count.IsBetween(MinMatch, MaxMatch))
-                            AddSequenceFromMatches(sequences, currentMatches, Sequence.SHAPES.VERTICAL);
+                            AddSequenceFromMatches(sequences, currentMatches, Sequence.Shapes.Vertical);
                     });
             }
 
@@ -140,7 +140,7 @@ namespace Match3Maker {
                     if (horizontalMiddleCell.InSamePositionAs(topEdgeCell) || horizontalMiddleCell.InSamePositionAs(bottomEdgeCell)
                             || verticalMiddleCell.InSamePositionAs(leftEdgeCell) || verticalMiddleCell.InSamePositionAs(rightEdgeCell)) {
 
-                        return new Sequence([.. horizontalSequence.Cells, .. verticalSequence.Cells], Sequence.SHAPES.T_SHAPE);
+                        return new Sequence([.. horizontalSequence.Cells, .. verticalSequence.Cells], Sequence.Shapes.TShape);
 
                     }
                 }
@@ -164,7 +164,7 @@ namespace Match3Maker {
                     if (leftEdgeCell.InSamePositionAs(topEdgeCell) || leftEdgeCell.InSamePositionAs(bottomEdgeCell)
                             || rightEdgeCell.InSamePositionAs(topEdgeCell) || rightEdgeCell.InSamePositionAs(bottomEdgeCell)) {
 
-                        return new Sequence([.. horizontalSequence.Cells, .. verticalSequence.Cells], Sequence.SHAPES.L_SHAPE);
+                        return new Sequence([.. horizontalSequence.Cells, .. verticalSequence.Cells], Sequence.Shapes.LShape);
                     }
                 }
             }
@@ -256,7 +256,7 @@ namespace Match3Maker {
             return verticalSequences;
         }
 
-        private static void AddSequenceFromMatches(List<Sequence> sequences, List<GridCell> matches, Sequence.SHAPES shape) {
+        private static void AddSequenceFromMatches(List<Sequence> sequences, List<GridCell> matches, Sequence.Shapes shape) {
             sequences.Add(new Sequence([.. matches], shape));
         }
     }

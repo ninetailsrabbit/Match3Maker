@@ -216,19 +216,19 @@ namespace Match3MakerTests {
             var horizontalCells = new List<GridCell>() { new(3, 3), new(3, 4), new(3, 5), new(3, 6), new(3, 7) };
             var verticalCells = new List<GridCell>() { new(2, 5), new(3, 5), new(4, 5) };
 
-            var horizontalSequence = new Sequence(horizontalCells, Sequence.SHAPES.T_SHAPE);
-            var verticalSequence = new Sequence(verticalCells, Sequence.SHAPES.L_SHAPE);
+            var horizontalSequence = new Sequence(horizontalCells, Sequence.Shapes.TShape);
+            var verticalSequence = new Sequence(verticalCells, Sequence.Shapes.LShape);
 
             Assert.Null(_sequenceMatcher.FindTShapeSequence(horizontalSequence, verticalSequence));
             Assert.Null(_sequenceMatcher.FindTShapeSequence(verticalSequence, horizontalSequence));
 
-            verticalSequence.Shape = Sequence.SHAPES.HORIZONTAL;
+            verticalSequence.Shape = Sequence.Shapes.Horizontal;
 
             Assert.Null(_sequenceMatcher.FindTShapeSequence(horizontalSequence, verticalSequence));
             Assert.Null(_sequenceMatcher.FindTShapeSequence(verticalSequence, horizontalSequence));
 
-            horizontalSequence.Shape = Sequence.SHAPES.L_SHAPE;
-            verticalSequence.Shape = Sequence.SHAPES.VERTICAL;
+            horizontalSequence.Shape = Sequence.Shapes.LShape;
+            verticalSequence.Shape = Sequence.Shapes.Vertical;
 
             Assert.Null(_sequenceMatcher.FindTShapeSequence(horizontalSequence, verticalSequence));
             Assert.Null(_sequenceMatcher.FindTShapeSequence(verticalSequence, horizontalSequence));
@@ -239,19 +239,19 @@ namespace Match3MakerTests {
             var horizontalCells = new List<GridCell>() { new(3, 3), new(3, 4), new(3, 5), new(3, 6), new(3, 7) };
             var verticalCells = new List<GridCell>() { new(2, 5), new(3, 5), new(4, 5) };
 
-            var horizontalSequence = new Sequence(horizontalCells, Sequence.SHAPES.T_SHAPE);
-            var verticalSequence = new Sequence(verticalCells, Sequence.SHAPES.L_SHAPE);
+            var horizontalSequence = new Sequence(horizontalCells, Sequence.Shapes.TShape);
+            var verticalSequence = new Sequence(verticalCells, Sequence.Shapes.LShape);
 
             Assert.Null(_sequenceMatcher.FindLShapeSequence(horizontalSequence, verticalSequence));
             Assert.Null(_sequenceMatcher.FindLShapeSequence(verticalSequence, horizontalSequence));
 
-            verticalSequence.Shape = Sequence.SHAPES.HORIZONTAL;
+            verticalSequence.Shape = Sequence.Shapes.Horizontal;
 
             Assert.Null(_sequenceMatcher.FindLShapeSequence(horizontalSequence, verticalSequence));
             Assert.Null(_sequenceMatcher.FindLShapeSequence(verticalSequence, horizontalSequence));
 
-            horizontalSequence.Shape = Sequence.SHAPES.L_SHAPE;
-            verticalSequence.Shape = Sequence.SHAPES.VERTICAL;
+            horizontalSequence.Shape = Sequence.Shapes.LShape;
+            verticalSequence.Shape = Sequence.Shapes.Vertical;
 
             Assert.Null(_sequenceMatcher.FindLShapeSequence(horizontalSequence, verticalSequence));
             Assert.Null(_sequenceMatcher.FindLShapeSequence(verticalSequence, horizontalSequence));
@@ -272,14 +272,14 @@ namespace Match3MakerTests {
                 new(5, 5, new Piece(_pieceFactory.CreateNormalPiece("square")))
             };
 
-            var horizontalSequence = new Sequence(horizontalCells, Sequence.SHAPES.HORIZONTAL);
-            var verticalSequence = new Sequence(verticalCells, Sequence.SHAPES.VERTICAL);
+            var horizontalSequence = new Sequence(horizontalCells, Sequence.Shapes.Horizontal);
+            var verticalSequence = new Sequence(verticalCells, Sequence.Shapes.Vertical);
 
             // Horizontal - Vertical column bottom
             var tShapeSequence = _sequenceMatcher.FindTShapeSequence(horizontalSequence, verticalSequence);
 
             Assert.Equal((horizontalCells.Count + verticalCells.Count) - 1, tShapeSequence?.Cells.Count);
-            Assert.Equal(Sequence.SHAPES.T_SHAPE, tShapeSequence?.Shape);
+            Assert.Equal(Sequence.Shapes.TShape, tShapeSequence?.Shape);
 
             // Horizontal - Vertical column top
             verticalCells = [
@@ -292,7 +292,7 @@ namespace Match3MakerTests {
             tShapeSequence = _sequenceMatcher.FindTShapeSequence(horizontalSequence, verticalSequence);
 
             Assert.Equal((horizontalCells.Count + verticalCells.Count) - 1, tShapeSequence?.Cells.Count);
-            Assert.Equal(Sequence.SHAPES.T_SHAPE, tShapeSequence?.Shape);
+            Assert.Equal(Sequence.Shapes.TShape, tShapeSequence?.Shape);
 
             // Vertical - Horizontal line right
             horizontalCells = [
@@ -312,7 +312,7 @@ namespace Match3MakerTests {
             tShapeSequence = _sequenceMatcher.FindTShapeSequence(horizontalSequence, verticalSequence);
 
             Assert.Equal((horizontalCells.Count + verticalCells.Count) - 1, tShapeSequence?.Cells.Count);
-            Assert.Equal(Sequence.SHAPES.T_SHAPE, tShapeSequence?.Shape);
+            Assert.Equal(Sequence.Shapes.TShape, tShapeSequence?.Shape);
 
             //Vertical - Horizontal line left
             horizontalCells = [
@@ -324,7 +324,7 @@ namespace Match3MakerTests {
             tShapeSequence = _sequenceMatcher.FindTShapeSequence(horizontalSequence, verticalSequence);
 
             Assert.Equal((horizontalCells.Count + verticalCells.Count) - 1, tShapeSequence?.Cells.Count);
-            Assert.Equal(Sequence.SHAPES.T_SHAPE, tShapeSequence?.Shape);
+            Assert.Equal(Sequence.Shapes.TShape, tShapeSequence?.Shape);
 
         }
 
@@ -343,13 +343,13 @@ namespace Match3MakerTests {
                 new(3, 5, new Piece(_pieceFactory.CreateNormalPiece("triangle")))
             };
 
-            var horizontalSequence = new Sequence(horizontalCells, Sequence.SHAPES.HORIZONTAL);
-            var verticalSequence = new Sequence(verticalCells, Sequence.SHAPES.VERTICAL);
+            var horizontalSequence = new Sequence(horizontalCells, Sequence.Shapes.Horizontal);
+            var verticalSequence = new Sequence(verticalCells, Sequence.Shapes.Vertical);
 
             var lShapeSequence = _sequenceMatcher.FindLShapeSequence(horizontalSequence, verticalSequence);
 
             Assert.Equal((horizontalCells.Count + verticalCells.Count) - 1, lShapeSequence?.Cells.Count);
-            Assert.Equal(Sequence.SHAPES.L_SHAPE, lShapeSequence?.Shape);
+            Assert.Equal(Sequence.Shapes.LShape, lShapeSequence?.Shape);
 
             verticalCells = [
                 new(3, 3, new Piece(_pieceFactory.CreateNormalPiece("triangle"))),
@@ -360,7 +360,7 @@ namespace Match3MakerTests {
             lShapeSequence = _sequenceMatcher.FindLShapeSequence(horizontalSequence, verticalSequence);
 
             Assert.Equal((horizontalCells.Count + verticalCells.Count) - 1, lShapeSequence?.Cells.Count);
-            Assert.Equal(Sequence.SHAPES.L_SHAPE, lShapeSequence?.Shape);
+            Assert.Equal(Sequence.Shapes.LShape, lShapeSequence?.Shape);
 
             verticalCells = [
                 new(7, 3, new Piece(_pieceFactory.CreateNormalPiece("triangle"))),
@@ -371,7 +371,7 @@ namespace Match3MakerTests {
             lShapeSequence = _sequenceMatcher.FindLShapeSequence(horizontalSequence, verticalSequence);
 
             Assert.Equal((horizontalCells.Count + verticalCells.Count) - 1, lShapeSequence?.Cells.Count);
-            Assert.Equal(Sequence.SHAPES.L_SHAPE, lShapeSequence?.Shape);
+            Assert.Equal(Sequence.Shapes.LShape, lShapeSequence?.Shape);
 
             verticalCells = [
                 new(7, 3, new Piece(_pieceFactory.CreateNormalPiece("triangle"))),
@@ -382,7 +382,7 @@ namespace Match3MakerTests {
             lShapeSequence = _sequenceMatcher.FindLShapeSequence(horizontalSequence, verticalSequence);
 
             Assert.Equal((horizontalCells.Count + verticalCells.Count) - 1, lShapeSequence?.Cells.Count);
-            Assert.Equal(Sequence.SHAPES.L_SHAPE, lShapeSequence?.Shape);
+            Assert.Equal(Sequence.Shapes.LShape, lShapeSequence?.Shape);
         }
     }
 

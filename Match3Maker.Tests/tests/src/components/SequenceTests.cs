@@ -13,11 +13,11 @@ namespace Match3MakerTests {
                 new(1, 4, new Piece(_pieceFactory.CreateNormalPiece("triangle")))
             };
 
-            var sequence = new Sequence(cells, Sequence.SHAPES.VERTICAL);
+            var sequence = new Sequence(cells, Sequence.Shapes.Vertical);
 
             Assert.Equal(sequence.Cells.Count, cells.Count);
             Assert.True(sequence.Cells.All(cell => cell.Column.Equals(1)));
-            Assert.Equal(Sequence.SHAPES.VERTICAL, sequence.Shape);
+            Assert.Equal(Sequence.Shapes.Vertical, sequence.Shape);
             Assert.False(sequence.IsHorizontal());
             Assert.True(sequence.IsVertical());
             Assert.False(sequence.IsTShape());
@@ -34,7 +34,7 @@ namespace Match3MakerTests {
 
             var emptyCell = new GridCell(1, 5);
 
-            var sequence = new Sequence([.. cells, emptyCell], Sequence.SHAPES.HORIZONTAL);
+            var sequence = new Sequence([.. cells, emptyCell], Sequence.Shapes.Horizontal);
 
             Assert.Equal(cells.Count, sequence.Size());
             Assert.True(sequence.Cells.All(cell => cell.HasPiece()));
@@ -48,7 +48,7 @@ namespace Match3MakerTests {
                 new Piece(_pieceFactory.CreateNormalPiece("triangle")))
             };
 
-            var sequence = new Sequence(cells, Sequence.SHAPES.VERTICAL);
+            var sequence = new Sequence(cells, Sequence.Shapes.Vertical);
 
             Assert.True(sequence.Pieces().All(piece => piece.Type.Shape.Equals("triangle")));
             Assert.Equal(cells.Count, sequence.Pieces().Count);
@@ -64,7 +64,7 @@ namespace Match3MakerTests {
                 new(2, 3, new Piece(_pieceFactory.CreateNormalPiece(shape)))
             };
 
-            var sequence = new Sequence(cells, Sequence.SHAPES.HORIZONTAL);
+            var sequence = new Sequence(cells, Sequence.Shapes.Horizontal);
 
             Assert.Equal(sequence.Cells.Count, cells.Count);
             Assert.Equal(cells.Count, sequence.Pieces().Count);
@@ -85,7 +85,7 @@ namespace Match3MakerTests {
                 new(2, 2, new Piece(_pieceFactory.CreateNormalPiece(shape))),
                 new(2, 3, new Piece(_pieceFactory.CreateNormalPiece(shape)))
             };
-            var sequence = new Sequence(cells, Sequence.SHAPES.VERTICAL);
+            var sequence = new Sequence(cells, Sequence.Shapes.Vertical);
 
             Assert.Equal(cells.Count, sequence.Pieces().Count);
             Assert.True(sequence.Pieces().All(piece => piece.MatchWith(new Piece(_pieceFactory.CreateNormalPiece(shape)))));
@@ -103,7 +103,7 @@ namespace Match3MakerTests {
 
             var sequence = new Sequence(cells);
 
-            Assert.Equal(Sequence.SHAPES.VERTICAL, sequence.Shape);
+            Assert.Equal(Sequence.Shapes.Vertical, sequence.Shape);
 
 
         }
@@ -120,7 +120,7 @@ namespace Match3MakerTests {
 
             var sequence = new Sequence(cells);
 
-            Assert.Equal(Sequence.SHAPES.HORIZONTAL, sequence.Shape);
+            Assert.Equal(Sequence.Shapes.Horizontal, sequence.Shape);
         }
 
         [Fact]
@@ -135,7 +135,7 @@ namespace Match3MakerTests {
 
             var sequence = new Sequence(cells);
 
-            Assert.Equal(Sequence.SHAPES.DIAGONAL, sequence.Shape);
+            Assert.Equal(Sequence.Shapes.Diagonal, sequence.Shape);
         }
 
 
@@ -151,7 +151,7 @@ namespace Match3MakerTests {
 
             var sequence = new Sequence(cells);
 
-            Assert.Equal(Sequence.SHAPES.IRREGULAR, sequence.Shape);
+            Assert.Equal(Sequence.Shapes.Irregular, sequence.Shape);
         }
 
         [Fact]
@@ -163,7 +163,7 @@ namespace Match3MakerTests {
                 new(2, 1, new Piece(_pieceFactory.CreateNormalPiece(shape))),
                 new(3, 1, new Piece(_pieceFactory.CreateNormalPiece(shape)))
             };
-            var sequence = new Sequence(cells, Sequence.SHAPES.HORIZONTAL);
+            var sequence = new Sequence(cells, Sequence.Shapes.Horizontal);
 
             Assert.Null(sequence.TopEdgeCell());
             Assert.Null(sequence.BottomEdgeCell());
@@ -198,7 +198,7 @@ namespace Match3MakerTests {
                 new(1, 2, new Piece(_pieceFactory.CreateNormalPiece(shape))),
                 new(1, 3, new Piece(_pieceFactory.CreateNormalPiece(shape)))
             };
-            var sequence = new Sequence(cells, Sequence.SHAPES.VERTICAL);
+            var sequence = new Sequence(cells, Sequence.Shapes.Vertical);
 
             Assert.Null(sequence.LeftEdgeCell());
             Assert.Null(sequence.RightEdgeCell());

@@ -107,9 +107,9 @@ namespace Match3MakerTests {
         public void Grid_Dimensions_Are_Clamped_ToMin() {
             var board = new Board(2, 1, 10, _mockPieceSelector.Object, _mockSequenceFinder.Object);
 
-            Assert.Equal(Board.MIN_GRID_WIDTH, board.GridWidth);
-            Assert.Equal(Board.MIN_GRID_HEIGHT, board.GridHeight);
-            Assert.Equal(Board.MIN_GRID_HEIGHT * Board.MIN_GRID_WIDTH, board.Dimensions());
+            Assert.Equal(Board.MinGridWidth, board.GridWidth);
+            Assert.Equal(Board.MinGridHeight, board.GridHeight);
+            Assert.Equal(Board.MinGridHeight * Board.MinGridWidth, board.Dimensions());
         }
 
         [Fact]
@@ -923,7 +923,7 @@ namespace Match3MakerTests {
                 new(1, 1, new Piece(_pieceFactory.CreateNormalPiece("circle"))),
                 new(1, 2, new Piece(_pieceFactory.CreateNormalPiece("circle"))),
                 new(1, 3, new Piece(_pieceFactory.CreateNormalPiece("circle"))),
-            }, Sequence.SHAPES.VERTICAL);
+            }, Sequence.Shapes.Vertical);
 
             board.ConsumeSequence(sequence);
 
@@ -1040,7 +1040,7 @@ namespace Match3MakerTests {
             var virtualBoard = board.MovePiecesAndFillEmptyCells();
 
             //No movements in the first row, only fills
-            Assert.True(virtualBoard.Updates.All(update => update.CurrentUpdateType.Equals(BoardCellUpdate.UPDATE_TYPE.FILL) && update.CellPieceFill.Cell.Row.Equals(0)));
+            Assert.True(virtualBoard.Updates.All(update => update.CurrentUpdateType.Equals(BoardCellUpdate.UpdateType.Fill) && update.CellPieceFill.Cell.Row.Equals(0)));
             Assert.Equal(board.GridWidth, virtualBoard.Updates.Count);
 
             // Virtual board has no empty cells after the fill but the original board should keep unaltered.
@@ -1067,7 +1067,7 @@ namespace Match3MakerTests {
             var virtualBoard = board.MovePiecesAndFillEmptyCells();
 
             //No movements in the first row, only fills
-            Assert.True(virtualBoard.Updates.All(update => update.CurrentUpdateType.Equals(BoardCellUpdate.UPDATE_TYPE.FILL) && update.CellPieceFill.Cell.Column.Equals(2)));
+            Assert.True(virtualBoard.Updates.All(update => update.CurrentUpdateType.Equals(BoardCellUpdate.UpdateType.Fill) && update.CellPieceFill.Cell.Column.Equals(2)));
             Assert.Equal(board.GridHeight, virtualBoard.Updates.Count);
 
             // Virtual board has no empty cells after the fill but the original board should keep unaltered.
@@ -1088,7 +1088,7 @@ namespace Match3MakerTests {
             var board = new Board(8, 7, 10);
             board.AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
 
-            var sequence = new Sequence([board.Cell(1, 2), board.Cell(2, 2), board.Cell(3, 2)], Sequence.SHAPES.HORIZONTAL);
+            var sequence = new Sequence([board.Cell(1, 2), board.Cell(2, 2), board.Cell(3, 2)], Sequence.Shapes.Horizontal);
 
             //No updates in an initial board
             Assert.Empty(board.MovePiecesAndFillEmptyCells().Updates);
@@ -1116,9 +1116,9 @@ namespace Match3MakerTests {
             List<Piece> pieces = [square, circle, triangle, prism, special];
 
             var board = new Board(8, 7, 10);
-            board.ChangeFillMode(Board.FILL_MODES.IN_PLACE).AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
+            board.ChangeFillMode(Board.FillModes.InPlace).AddAvailablePieces(pieces).PrepareGridCells().FillInitialBoard(true);
 
-            var sequence = new Sequence([board.Cell(1, 2), board.Cell(2, 2), board.Cell(3, 2)], Sequence.SHAPES.HORIZONTAL);
+            var sequence = new Sequence([board.Cell(1, 2), board.Cell(2, 2), board.Cell(3, 2)], Sequence.Shapes.Horizontal);
 
             //No updates in an initial board
             Assert.Empty(board.MovePiecesAndFillEmptyCells().Updates);
